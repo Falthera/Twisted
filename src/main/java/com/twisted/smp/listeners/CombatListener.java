@@ -80,7 +80,7 @@ public class CombatListener implements Listener {
                     case FROSTBORN -> "§b";
                 };
                 plugin.vfx().holograms().spawnTextHologram(deathLoc.clone().add(0, 1.2, 0),
-                    twistColor + "☠ " + killer.getName() + " §8× " + victim.getName(), 50, net.kyori.adventure.text.color.TextColor.color(0xbbbbbb));
+                    twistColor + "☠ " + killer.getName() + " §8× " + victim.getName(), 50, net.kyori.adventure.text.format.TextColor.color(0xbbbbbb));
             }
 
             if (canGiveEnergy) {

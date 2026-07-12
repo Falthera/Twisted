@@ -81,10 +81,10 @@ public class RecipeManager {
         ItemStack item = new ItemStack(Material.NETHER_STAR);
         ItemMeta meta = item.getItemMeta();
         meta.displayName(net.kyori.adventure.text.Component.text("Twisted Core")
-            .color(net.kyori.adventure.text.color.TextColor.color(0xa29bfe)));
+            .color(net.kyori.adventure.text.format.TextColor.color(0xa29bfe)));
         meta.lore(List.of(
             net.kyori.adventure.text.Component.text("Change your Twist for 100 Essence.")
-                .color(net.kyori.adventure.text.color.TextColor.color(0xaaaaaa))
+                .color(net.kyori.adventure.text.format.TextColor.color(0xaaaaaa))
         ));
         item.setItemMeta(meta);
         return item;
@@ -94,10 +94,10 @@ public class RecipeManager {
         ItemStack item = new ItemStack(Material.AMETHYST_CLUSTER);
         ItemMeta meta = item.getItemMeta();
         meta.displayName(net.kyori.adventure.text.Component.text("Stability Crystal")
-            .color(net.kyori.adventure.text.color.TextColor.color(0x74b9ff)));
+            .color(net.kyori.adventure.text.format.TextColor.color(0x74b9ff)));
         meta.lore(List.of(
             net.kyori.adventure.text.Component.text("Reduces Instability by 50%.")
-                .color(net.kyori.adventure.text.color.TextColor.color(0xaaaaaa))
+                .color(net.kyori.adventure.text.format.TextColor.color(0xaaaaaa))
         ));
         item.setItemMeta(meta);
         return item;
@@ -107,10 +107,10 @@ public class RecipeManager {
         ItemStack item = new ItemStack(Material.BEACON);
         ItemMeta meta = item.getItemMeta();
         meta.displayName(net.kyori.adventure.text.Component.text("Essence Extractor")
-            .color(net.kyori.adventure.text.color.TextColor.color(0xfdcb6e)));
+            .color(net.kyori.adventure.text.format.TextColor.color(0xfdcb6e)));
         meta.lore(List.of(
             net.kyori.adventure.text.Component.text("Use this to extract Essence from ores.")
-                .color(net.kyori.adventure.text.color.TextColor.color(0xaaaaaa))
+                .color(net.kyori.adventure.text.format.TextColor.color(0xaaaaaa))
         ));
         item.setItemMeta(meta);
         return item;
@@ -120,10 +120,10 @@ public class RecipeManager {
         ItemStack item = new ItemStack(Material.TRIPWIRE_HOOK);
         ItemMeta meta = item.getItemMeta();
         meta.displayName(net.kyori.adventure.text.Component.text("Rift Key")
-            .color(net.kyori.adventure.text.color.TextColor.color(0xff6b6b)));
+            .color(net.kyori.adventure.text.format.TextColor.color(0xff6b6b)));
         meta.lore(List.of(
             net.kyori.adventure.text.Component.text("Use to start a Rift Event.")
-                .color(net.kyori.adventure.text.color.TextColor.color(0xaaaaaa))
+                .color(net.kyori.adventure.text.format.TextColor.color(0xaaaaaa))
         ));
         item.setItemMeta(meta);
         return item;

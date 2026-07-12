@@ -77,9 +77,9 @@ public class EvolutionManager {
             player.getWorld().spawnParticle(org.bukkit.Particle.FLASH, loc.clone().add(0, 1, 0), 3, 0.5, 0.5, 0.5, 0);
 
             net.kyori.adventure.text.Component title = net.kyori.adventure.text.Component.text("EVOLVED!")
-                .color(net.kyori.adventure.text.color.TextColor.color(0xfdcb6e));
+                .color(net.kyori.adventure.text.format.TextColor.color(0xfdcb6e));
             net.kyori.adventure.text.Component subtitle = net.kyori.adventure.text.Component.text(newName)
-                .color(net.kyori.adventure.text.color.TextColor.color(0xffffff));
+                .color(net.kyori.adventure.text.format.TextColor.color(0xffffff));
             player.showTitle(Title.title(title, subtitle,
                 Title.Times.times(Duration.ofMillis(100), Duration.ofMillis(500), Duration.ofMillis(250))));
 

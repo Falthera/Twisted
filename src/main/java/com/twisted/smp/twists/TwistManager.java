@@ -189,9 +189,9 @@ public class TwistManager {
         sounds.playTwistSelectSound(player);
 
         net.kyori.adventure.text.Component title = net.kyori.adventure.text.Component.text("Twist Chosen")
-            .color(net.kyori.adventure.text.color.TextColor.color(0xa29bfe));
+            .color(net.kyori.adventure.text.format.TextColor.color(0xa29bfe));
         net.kyori.adventure.text.Component subtitle = net.kyori.adventure.text.Component.text("Your destiny awaits...")
-            .color(net.kyori.adventure.text.color.TextColor.color(0xffffff));
+            .color(net.kyori.adventure.text.format.TextColor.color(0xffffff));
         player.showTitle(Title.title(title, subtitle, Title.Times.times(Duration.ofMillis(200),
             Duration.ofMillis(600), Duration.ofMillis(200))));
 

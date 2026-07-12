@@ -165,8 +165,8 @@ public class ParticlePatterns {
             return org.bukkit.Color.fromRGB(hex);
         }
 
-        public net.kyori.adventure.text.color.TextColor toAdventure() {
-            return net.kyori.adventure.text.color.TextColor.color(hex);
+        public net.kyori.adventure.text.format.TextColor toAdventure() {
+            return net.kyori.adventure.text.format.TextColor.color(hex);
         }
     }
 

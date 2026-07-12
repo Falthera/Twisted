@@ -179,9 +179,9 @@ public class TwistCommand implements CommandExecutor, TabCompleter {
         org.bukkit.inventory.ItemStack item = new org.bukkit.inventory.ItemStack(org.bukkit.Material.DIAMOND, stackSize);
         org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(net.kyori.adventure.text.Component.text("Twisted Essence", net.kyori.adventure.text.color.TextColor.color(0xa29bfe)));
+            meta.displayName(net.kyori.adventure.text.Component.text("Twisted Essence", net.kyori.adventure.text.format.TextColor.color(0xa29bfe)));
             java.util.List<net.kyori.adventure.text.Component> lore = new java.util.ArrayList<>();
-            lore.add(net.kyori.adventure.text.Component.text("Worth: " + (int) amount + " Essence", net.kyori.adventure.text.color.TextColor.color(0xbb86fc)));
+            lore.add(net.kyori.adventure.text.Component.text("Worth: " + (int) amount + " Essence", net.kyori.adventure.text.format.TextColor.color(0xbb86fc)));
             meta.lore(lore);
             item.setItemMeta(meta);
         }
