@@ -3,6 +3,7 @@ package com.twisted.smp.energy;
 import com.twisted.smp.TwistedSMP;
 import com.twisted.smp.core.ConfigManager;
 import com.twisted.smp.core.PlayerData;
+import java.util.UUID;
 import org.bukkit.entity.Player;
 
 public class EssenceManager {

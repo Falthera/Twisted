@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 
 public final class ConfigManager {
 
