@@ -218,7 +218,7 @@ public class AbilityManager {
                         kb.multiply(1.0 - (distance / radius) * 0.5);
                         target.setVelocity(kb);
 
-                        ParticlePatterns.damageNumber(target.getLocation().clone().add(0, 1, 0), damage, ParticlePatterns.Color.EARTH);
+                        ParticlePatterns.damageNumber(target.getLocation().clone().add(0, 1, 0), damage, ParticlePatterns.Color.EARTH, plugin);
                         target.getWorld().playSound(target.getLocation(), Sound.BLOCK_STONE_BREAK, 0.7f, 0.8f);
                     }
                 }

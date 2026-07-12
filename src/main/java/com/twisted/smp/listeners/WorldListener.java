@@ -85,7 +85,7 @@ public class WorldListener implements Listener {
             if (block != null && block.getType() == Material.CHEST) {
                 RiftEvent rift = plugin.getRiftEvent();
                 if (rift.isActive() && block.getLocation().distance(rift.getRiftLocation()) < 20) {
-                    org.bukkit.scheduler.Bukkit.getScheduler().runTask(plugin, () -> rift.openRiftChest(event.getPlayer()));
+                    Bukkit.getScheduler().runTask(plugin, () -> rift.openRiftChest(event.getPlayer()));
                 }
             }
         }
