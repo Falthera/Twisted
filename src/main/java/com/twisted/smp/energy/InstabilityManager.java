@@ -88,6 +88,10 @@ public class InstabilityManager {
     public TwistedSMP getPlugin() {
         return plugin;
     }
+    public void applyInstabilityEffects(PlayerData data) {
+        org.bukkit.entity.Player player = org.bukkit.Bukkit.getPlayer(data.getUuid());
+        if (player == null || !player.isOnline()) return;
+
         int level = getInstabilityLevel(data);
         if (level >= 1 && random.nextDouble() < 0.1) {
             player.damage(1.0);
