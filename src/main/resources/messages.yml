@@ -1,0 +1,137 @@
+prefix: "<dark_gray>[<gradient:#ff6b6b:#feca57>Twisted SMP</gradient><dark_gray>]"
+
+# =====================================================
+# General Messages
+# =====================================================
+no-permission: "{prefix} <red>You do not have permission to use this command."
+player-only: "{prefix} <red>This command can only be used by players."
+player-not-found: "{prefix} <red>Player '%arg0%' not found."
+invalid-arguments: "{prefix} <red>Usage: /twist <action> [args]"
+reload-success: "{prefix} <green>Configuration reloaded successfully."
+reload-fail: "{prefix} <red>Failed to reload configuration."
+
+# =====================================================
+# Twist System Messages
+# =====================================================
+twist-selected: "{prefix} <green>You have chosen the <white>%twist%</white> twist!"
+twist-already-selected: "{prefix} <red>You have already selected a twist: %twist%"
+twist-selection-gui-title: "Select Your Twist"
+twist-selection-gui-lore:
+  - "<gray>Click to choose this twist!"
+twist-info-format: |
+  <white>Twist: <gradient:#a29bfe:#74b9ff>%twist%</gradient>
+  <white>Stage: <gold>%stage%</gold>
+  <white>Energy: <blue>%energy%</blue>
+  <white>Essence: <dark_purple>%essence%</dark_purple>
+  <white>Instability: <red>%instability%</red>
+  <white>Kills: <green>%kills%</green> | <white>Deaths: <dark_red>%deaths%</dark_red>
+
+# =====================================================
+# Energy Messages
+# =====================================================
+energy-gain: "{prefix} <green>+%amount% Energy <gray>(Total: %new%)"
+energy-loss: "{prefix} <red>-%amount% Energy <gray>(Total: %new%)"
+energy-overflow: "{prefix} <yellow>Energy overflow! Converted to +%amount% Essence."
+energy-max-reached: "{prefix} <gold>Energy has reached maximum! Overflow converted to Essence."
+energy-stage-dormant: "<gray>Dormant"
+energy-stage-awakened: "<green>Awakened"
+energy-stage-enhanced: "<blue>Enhanced"
+energy-stage-corrupted: "<red>Corrupted"
+energy-stage-ascended: "<gold>Ascended"
+
+# =====================================================
+# Essence Messages
+# =====================================================
+essence-gain: "{prefix} <dark_purple>+%amount% Essence <gray>(Total: %new%)"
+essence-loss: "{prefix} <dark_red>-%amount% Essence <gray>(Total: %new%)"
+essence-insufficient: "{prefix} <red>Not enough Essence! Required: %amount%, Have: %have%"
+withdraw-success: "{prefix} <dark_purple>Withdrew %amount% Essence into items."
+withdraw-fail: "{prefix} <red>Could not withdraw %amount% Essence. Ensure you have room in your inventory."
+withdraw-deposit: "{prefix} <dark_purple>Deposited %amount% Essence back from Twisted Essence item."
+
+# =====================================================
+# Instability Messages
+# =====================================================
+instability-gain: "{prefix} <dark_red>Instability rising! +%amount% <gray>(Total: %new%)"
+instability-effect-notify: "{prefix} <red>You feel corrupted by your power... <white>(Instability: %instability%)</white>"
+
+# =====================================================
+# Evolution Messages
+# =====================================================
+evolution-available: "{prefix} <green>Your Twist can evolve! Use <white>/twist evolve</white> to ascend."
+evolution-success: "{prefix} <gold>★ Your Twist has evolved!</gold> <white>New form: <gradient:#a29bfe:#74b9ff>%new_name%</gradient></white>"
+evolution-fail-requirements: "{prefix} <red>Cannot evolve yet. Requirements: %requirements%"
+evolution-fail-energy: "{prefix} <red>Not enough Energy. Required: %required%"
+evolution-fail-essence: "{prefix} <red>Not enough Essence. Required: %required%"
+
+# =====================================================
+# Ability Messages
+# =====================================================
+ability-used: "{prefix} <green>You used <white>%ability%</white>!"
+ability-cooldown: "{prefix} <red>%ability% is on cooldown! <gray>%time%s remaining.</gray>"
+ability-max-callers: "{prefix} <red>Too many players nearby! Cannot cast."
+ability-no-target: "{prefix} <red>No valid target in range!"
+
+# =====================================================
+# Combat Messages
+# =====================================================
+kill-player: "{prefix} <green>You killed <white>%victim%</white>! +%energy% Energy"
+killed-by-player: "{prefix} <red>You were killed by <white>%killer%</white>! -%energy% Energy"
+death-penalty: "{prefix} <red>You died! -%energy% Energy"
+kill-farming-warn: "{prefix} <yellow>Warning: Killing the same player repeatedly reduces reward."
+
+# =====================================================
+# Event Messages
+# =====================================================
+event-storm-start: "{prefix} <gold>A Twisted Storm has begun! <white>Increased energy gain for a limited time!</white>"
+event-storm-end: "{prefix} <gray>The Twisted Storm has passed."
+event-countdown: "{prefix} <white>The storm ends in <gold>%time%</gold> seconds."
+event-rift-start-broadcast: "<dark_gray>[</dark_gray><gradient:#ff6b6b:#feca57>GLOBAL EVENT</gradient><dark_gray>] <white>A Twisted Rift has appeared somewhere in the world! <gold>Seek it out for rewards!</gold>"
+event-rift-start-local: "{prefix} <gradient:#ff6b6b:#feca57>A Rift has opened nearby!</gradient> <white>Follow the particles to find it.</white>"
+event-rift-end: "{prefix} <gray>The Rift has closed."
+event-invalid: "{prefix} <red>Unknown event: %event%"
+
+# =====================================================
+# Crafting Messages
+# =====================================================
+recipe-unlock: "{prefix} <green>Unlocked recipe: <white>%recipe%</white>"
+crafting-invalid: "{prefix} <red>Invalid crafting recipe."
+
+# =====================================================
+# Admin Messages
+# =====================================================
+admin-set-success: "{prefix} <green>Set %player%'s twist to %twist%."
+admin-set-fail: "{prefix} <red>Failed to set twist for %player%."
+admin-giveenergy-success: "{prefix} <green>Gave %player% %amount% Energy."
+admin-giveessence-success: "{prefix} <green>Gave %player% %amount% Essence."
+admin-give-fail: "{prefix} <red>Failed to give to %player%."
+admin-event-start: "{prefix} <green>Started event: %event%"
+admin-event-stop: "{prefix} <green>Stopped event: %event%"
+admin-reload: "{prefix} <green>Reloaded TwistedSMP configuration."
+
+# =====================================================
+# Titles and Action Bars
+# =====================================================
+title-twist-selected:
+  title: "<gradient:#a29bfe:#74b9ff>Twist Chosen</gradient>"
+  subtitle: "<white>Your destiny awaits...</white>"
+  fade-in: 20
+  stay: 60
+  fade-out: 20
+
+title-evolution:
+  title: "<gradient:#fdcb6e:#e17055>Evolved!</gradient>"
+  subtitle: "<white>%name%</white>"
+  fade-in: 10
+  stay: 40
+  fade-out: 20
+
+title-ascension:
+  title: "<gradient:#feca57:#ff6b6b>Ascended!</gradient>"
+  subtitle: "<gold>The strongest...</gold>"
+  fade-in: 15
+  stay: 60
+  fade-out: 30
+
+action-bar-ability-ready: "<green><bold>ABILITY READY</bold> <gray>»</gray> %ability%"
+action-bar-instability-warning: "<red><bold>CORRUPTION</bold> <gray>»</gray> Instability is rising... %instability%"

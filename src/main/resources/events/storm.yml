@@ -1,0 +1,26 @@
+name: "Twisted Storm"
+display-name: "<gradient:#feca57:#ff6b6b>Twisted Storm</gradient>"
+description: "A supernatural storm amplifies all Twist energies."
+
+duration: 300
+
+# Multipliers
+energy-gain-multiplier: 2.0
+instability-gain-multiplier: 1.5
+
+weather:
+  set-thunder: true
+  set-rain: true
+  # If set-thunder is true, lightning will strike randomly
+  lightning-strikes: true
+  lightning-frequency: 20  # seconds between strikes
+
+broadcast:
+  start: "<dark_gray>[</dark_gray><gradient:#feca57:#ff6b6b>STORM</gradient><dark_gray>] <white>A Twisted Storm has begun! <gold>Energy gain doubled for a limited time!</gold>"
+  end: "<dark_gray>[</dark_gray><gradient:#feca57:#ff6b6b>STORM</gradient><dark_gray>] <white>The Twisted Storm has cleared.</white>"
+  countdown: |
+    <dark_gray>[</dark_gray><gradient:#feca57:#ff6b6b>STORM</gradient><dark_gray>] <white>The storm ends in <gold>%time%</gold> seconds.
+
+particles:
+  storm: FLAME
+  enabled: true

@@ -1,0 +1,14 @@
+target/
+*.jar
+*.class
+*.log
+.mvn/
+.idea/
+*.iml
+*.ipr
+*.iws
+*.classpath
+*.project
+*.settings
+/.mvn/
+/*.zip

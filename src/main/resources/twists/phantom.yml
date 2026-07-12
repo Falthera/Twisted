@@ -1,0 +1,60 @@
+name: "Phantom"
+display-name: "<gradient:#b2bec3:#2d3436>Phantom</gradient>"
+description: "Strike from the shadows. Move unseen and unheard."
+material: FEATHER
+
+passive:
+  # Night vision while Twist is active
+  night-vision: true
+  # Multiplier for footstep sound volume (0 = silent, 1 = normal)
+  footstep-sound-multiplier: 0.1
+  # Armor effectiveness multiplier (<1 = reduced)
+  armor-effectiveness-multiplier: 0.6
+  # Sun damage per tick (0 = none)
+  sun-damage: 0.5
+
+ability:
+  name: "Fade"
+  material: GLASS
+  description: "Vanish from sight, becoming invisible for a short duration."
+  # Duration in seconds
+  duration: 8
+  cooldown: 60
+  # Particles visible to others (true = subtle particles around player)
+  reveal-particles-others: true
+  stage-2:
+    duration: 12
+    cooldown: 45
+    reveal-particles-others: false
+  stage-3:
+    duration: 20
+    cooldown: 30
+    reveal-particles-others: false
+
+evolution:
+  stage-1:
+    name: "Phantom"
+    energy-required: 100
+    essence-required: 0
+    icon: PHANTOM_MEMBRANE
+    lore:
+      - "<gray>A shadow's whisper."
+  stage-2:
+    name: "Wraith"
+    energy-required: 150
+    essence-required: 50
+    icon: SKELETON_SKULL
+    lore:
+      - "<dark_aqua>Embracing the spirit realm."
+      - "<gray>Extended invisibility and reduced detection."
+  stage-3:
+    name: "Specter"
+    energy-required: 200
+    essence-required: 150
+    icon: WITHER_SKELETON_SKULL
+    lore:
+      - "<black>You are the void between breaths."
+
+particles:
+  fade: CLOUD
+  enabled: true

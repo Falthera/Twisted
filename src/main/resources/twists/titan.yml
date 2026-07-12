@@ -1,0 +1,63 @@
+name: "Titan"
+display-name: "<gradient:#dfe6e9:#636e72>Titan</gradient>"
+description: "Unbreakable force. Stand tall and shake the earth."
+material: SHIELD
+
+passive:
+  # Extra hearts
+  extra-hearts: 4
+  # Knockback resistance (0.0 to 1.0)
+  knockback-resistance: 0.4
+  # Slower movement (1.0 = normal, >1 = slower multiplier)
+  movement-speed-multiplier: 0.85
+  # Slower mining (1.0 = normal, <1 = slower)
+  mining-speed-multiplier: 0.7
+
+ability:
+  name: "Earthquake"
+  material: COBBLESTONE
+  description: "Slams the ground, creating a shockwave that damages and knocks back nearby players."
+  # Radius in blocks
+  radius: 6
+  # Damage dealt (0.5 hearts = 1 full heart)
+  damage: 3.0
+  # Knockback force
+  knockback-vertical: 0.8
+  knockback-horizontal: 1.2
+  cooldown: 45
+  stage-2:
+    radius: 8
+    damage: 4.0
+    cooldown: 35
+  stage-3:
+    radius: 12
+    damage: 6.0
+    cooldown: 25
+
+evolution:
+  stage-1:
+    name: "Titan"
+    energy-required: 100
+    essence-required: 0
+    icon: DIRT
+    lore:
+      - "<gray>Immense strength granted."
+  stage-2:
+    name: "Gaia's Warden"
+    energy-required: 150
+    essence-required: 50
+    icon: GRASS_BLOCK
+    lore:
+      - "<green>Channelled the power of earth."
+      - "<gray>Quake range increased significantly."
+  stage-3:
+    name: "World-Shaker"
+    energy-required: 200
+    essence-required: 150
+    icon: NETHERITE_BLOCK
+    lore:
+      - "<dark_gray>The ground trembles at your presence."
+
+particles:
+  earthquake: CLOUD
+  enabled: true

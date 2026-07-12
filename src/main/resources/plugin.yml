@@ -1,0 +1,46 @@
+name: TwistedSMP
+version: ${project.version}
+main: com.twisted.smp.TwistedSMP
+api-version: '1.21'
+author: TwistedSMP
+description: A supernatural progression SMP plugin where players choose unique Twist ability paths.
+website: https://twisted-smp.example.com
+load: POSTWORLD
+prefix: TwistedSMP
+
+softdepend:
+  - PlaceholderAPI
+  - PacketEvents
+
+commands:
+  twist:
+    description: Main TwistedSMP command
+    usage: /<command> [stats|ability|evolve]
+    aliases: [twistsmp, tsmp]
+    permission: twistedsmp.use
+    permission-message: <red>You do not have permission to use this command.
+
+  twistadmin:
+    description: Admin commands for TwistedSMP
+    usage: /twistadmin set <player> <twist> | giveenergy <player> <amount> | giveessence <player> <amount> | event start <event> | event stop
+    permission: twistedsmp.admin
+    permission-message: <red>You do not have permission to use admin commands.
+
+permissions:
+  twistedsmp.use:
+    description: Base command usage
+    default: true
+  twistedsmp.admin:
+    description: Admin permissions
+    default: op
+    children:
+      twistedsmp.use: true
+  twistedsmp.stats:
+    description: View own stats
+    default: true
+  twistedsmp.ability:
+    description: Use Twist ability
+    default: true
+  twistedsmp.evolve:
+    description: Evolve Twist
+    default: true

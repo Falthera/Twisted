@@ -1,0 +1,67 @@
+name: "Frostborn"
+display-name: "<gradient:#74b9ff:#0984e3>Frostborn</gradient>"
+description: "Command the cold. Freeze enemies and walk across frozen waters."
+material: ICE
+
+passive:
+  # Powder snow immunity
+  powder-snow-immunity: true
+  # Walk on ice without slipping
+  ice-walk: true
+  # Increased fire damage taken
+  fire-damage-multiplier: 1.5
+  # Slight slowness on cold biomes (true = intensifies existing slowness)
+  cold-sensitivity: true
+
+ability:
+  name: "Freeze"
+  material: PACKED_ICE
+  description: "Freezes nearby players in place with a wave of frost."
+  # Duration frozen in seconds
+  freeze-duration: 3
+  # Radius in blocks
+  radius: 5
+  # Freeze amplifier (slowness level applied)
+  slowness-amplifier: 4
+  # Self-freeze prevention
+  freeze-self: false
+  cooldown: 40
+  stage-2:
+    freeze-duration: 5
+    radius: 7
+    slowness-amplifier: 6
+    cooldown: 30
+  stage-3:
+    freeze-duration: 7
+    radius: 10
+    slowness-amplifier: 10
+    cooldown: 20
+    freeze-self: true
+
+evolution:
+  stage-1:
+    name: "Frostborn"
+    energy-required: 100
+    essence-required: 0
+    icon: ICE
+    lore:
+      - "<blue>Chills the air around you.</blue>"
+  stage-2:
+    name: "Glacierborn"
+    energy-required: 150
+    essence-required: 50
+    icon: PACKED_ICE
+    lore:
+      - "<aqua>The ice deepens.</aqua>"
+      - "<gray>Stronger freeze and wider area.</gray>"
+  stage-3:
+    name: "Absolute Zero"
+    energy-required: 200
+    essence-required: 150
+    icon: BLUE_ICE
+    lore:
+      - "<dark_blue>Time itself slows before you.</dark_blue>"
+
+particles:
+  freeze: SNOWFLAKE
+  enabled: true

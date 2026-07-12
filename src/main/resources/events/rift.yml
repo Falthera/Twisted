@@ -1,0 +1,32 @@
+name: "Rift"
+display-name: "<gradient:#a29bfe:#fd79a8>Twisted Rift</gradient>"
+description: "A rift event that opens a portal to the twisted realm."
+duration: 600
+# Distance from spawn to generate rift if no location specified (0 = random)
+min-distance-from-spawn: 500
+max-distance-from-spawn: 2000
+# Dimensional restrictions
+allowed-worlds:
+  - world
+  - world_nether
+  - world_the_end
+
+# Rewards
+rewards:
+  essence:
+    min: 20
+    max: 50
+  materials:
+    - DIAMOND;1;3
+    - NETHERITE_SCRAP;1;2
+    - ENDER_PEARL;2;5
+    - ECHO_SHARD;1;3
+
+particles:
+  rift-appear: PORTAL
+  duration: 60
+
+broadcast:
+  start: |
+    <dark_gray>[</dark_gray><gradient:#ff6b6b:#feca57>GLOBAL EVENT</gradient><dark_gray>] <white>A Twisted Rift has appeared somewhere in the world! <gold>Seek it out for rewards!</gold>
+  local-radius: 200

@@ -1,0 +1,63 @@
+name: "Berserker"
+display-name: "<gradient:#d63031:#e17055>Berserker</gradient>"
+description: "Channel your rage. The lower your health, the stronger you become."
+material: IRON_SWORD
+
+passive:
+  # Damage multiplier scales: (1 - health%) * multiplier
+  low-health-damage-multiplier: 2.0
+  # Hunger drain multiplier (>1 = faster)
+  hunger-drain-multiplier: 1.8
+  # Reduced natural regeneration (0.0 = disabled)
+  natural-regen-reduction: 0.5
+
+ability:
+  name: "Blood Rage"
+  material: REDSTONE
+  description: "Enter a frenzied state, gaining Strength and Speed."
+  # Duration in seconds
+  duration: 10
+  # Effect amplifiers (1 = Strength II, Speed II)
+  strength-amplifier: 1
+  speed-amplifier: 1
+  # Apply weakness when effect ends (to prevent exploitation)
+  post-effect-threshold: 0.5
+  cooldown: 60
+  stage-2:
+    duration: 15
+    strength-amplifier: 2
+    speed-amplifier: 2
+    cooldown: 45
+  stage-3:
+    duration: 20
+    strength-amplifier: 3
+    speed-amplifier: 2
+    cooldown: 30
+
+evolution:
+  stage-1:
+    name: "Berserker"
+    energy-required: 100
+    essence-required: 0
+    icon: RED_GEM
+    lore:
+      - "<gray>Rage courses through your veins."
+  stage-2:
+    name: "Warlord"
+    energy-required: 150
+    essence-required: 50
+    icon: DIAMOND_AXE
+    lore:
+      - "<dark_red>Battle-hardened fury."
+      - "<gray>Longer rage, more devastating effects."
+  stage-3:
+    name: "Bloodreaver"
+    energy-required: 200
+    essence-required: 150
+    icon: NETHERITE_AXE
+    lore:
+      - "<red>An unstoppable force of destruction."
+
+particles:
+  blood-rage: VILLAGER_ANGRY
+  enabled: true

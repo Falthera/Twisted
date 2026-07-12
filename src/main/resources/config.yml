@@ -1,0 +1,159 @@
+# =====================================================
+# TwistedSMP - Core Configuration
+# =====================================================
+
+# Plugin settings
+settings:
+  # Debug mode - logs additional information
+  debug: false
+  # Auto-save interval in seconds
+  auto-save-interval: 300
+  # Twist selection GUI title
+  selection-gui-title: "Choose Your Twist"
+  # Ability command cooldown (in seconds)
+  ability-cooldown-message: "{prefix} <red>Ability on cooldown! <gray>%time%s remaining."
+
+# =====================================================
+# Energy System
+# =====================================================
+energy:
+  # Maximum energy value
+  max-energy: 200
+  # Starting energy for new players
+  starting-energy: 0
+  # Energy gained on player kill
+  kill-reward: 25
+  # Energy lost on death to player
+  death-penalty: -35
+  # Energy lost on non-PvP death
+  normal-death-penalty: -25
+  # Energy gained for Ender Dragon kill
+  dragon-kill-reward: 50
+  # Energy gained for Wither kill
+  wither-kill-reward: 40
+  # Energy decay per minute when above 150% (to simulate instability)
+  high-energy-decay: 0
+
+# =====================================================
+# Essence System
+# =====================================================
+essence:
+  # Starting essence
+  starting-essence: 0
+  # Essence gained per overflow energy point
+  overflow-ratio: 1
+  # Cost to change twist
+  twist-change-cost: 100
+
+# =====================================================
+# Instability System
+# =====================================================
+instability:
+  # Maximum instability
+  max-instability: 100
+  # Minimum energy threshold before instability starts growing
+  energy-threshold: 150
+  # Instability gain per minute when above energy threshold (0 = disabled)
+  passive-instability-gain: 0
+  # Instability gained on ability overflow (0 = disabled)
+  ability-overflow-instability: 5
+
+# =====================================================
+# Evolution System
+# =====================================================
+evolution:
+  # Base evolution requirements per twist are in twist configs
+  # Global evolution requirements
+  base-stage-2-energy: 150
+  base-stage-2-essence: 50
+  base-stage-3-energy: 200
+  base-stage-3-essence: 150
+
+# =====================================================
+# Anti-Abuse System
+# =====================================================
+anti-abuse:
+  # Prevent killing the same player repeatedly for energy gain
+  kill-farming:
+    enabled: true
+    # Same-player kill cooldown in seconds
+    cooldown: 60
+    # Max kills against same player before penalty
+    max-kills-before-penalty: 3
+    # Ratio of energy reward reduction per extra kill
+    penalty-ratio: 0.5
+
+  # Combat logging detection
+  combat-logging:
+    enabled: true
+    # Tag duration in seconds
+    tag-duration: 10
+    # Penalty for combat log
+    energy-penalty: -15
+    instability-penalty: 10
+
+  # Alt account protection
+  alt-farming:
+    enabled: true
+    # Minimum playtime in minutes before eligible for rewards
+    min-playtime: 30
+    # Same-IP kill cooldown
+    ip-kill-cooldown: 30
+
+# =====================================================
+# Database
+# =====================================================
+database:
+  # Database type (only sqlite supported currently)
+  type: sqlite
+  # SQLite file location
+  sqlite:
+    file: twisted-data.db
+
+# =====================================================
+# PlaceholderAPI
+# =====================================================
+placeholders:
+  # Enable PlaceholderAPI integration if present
+  enabled: true
+
+# =====================================================
+# Recipes
+# =====================================================
+recipes:
+  # Enable all custom crafting recipes
+  enabled: true
+  # Notify players when they unlock new recipes
+  notify-on-unlock: true
+
+# =====================================================
+# Boss Bar
+# =====================================================
+boss-bar:
+  # Show boss bar for energy level
+  enabled: true
+  # Title shown on boss bar
+  title: "<gradient:#ff6b6b:#feca57>Twisted Energy</gradient> <white>%energy%"
+  # Bar color
+  color: RED
+  # Bar overlay style
+  overlay: NOTCHED_10
+  # Show darken sky / create fog based on instability
+  darken-sky-per-instability: true
+
+# =====================================================
+# VFX - Visual Effects
+# =====================================================
+vfx:
+  # Master toggle for all elite VFX
+  enabled: true
+  # Enable floating hologram text displays
+  holograms: true
+  # Enable screen shake effects on ability hits and events
+  screen-shake: true
+  # Enable layered sound design
+  sounds: true
+  # Show floating damage numbers on combat hits
+  damage-numbers: true
+  # Enable particle intensity (0 = minimal, 1 = standard, 2 = high, 3 = ultra)
+  particle-density: 2

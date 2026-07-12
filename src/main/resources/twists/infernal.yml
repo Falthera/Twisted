@@ -1,0 +1,64 @@
+name: "Infernal"
+display-name: "<gradient:#ff7675:#d63031>Infernal</gradient>"
+description: "Burn with eternal flame. Walk through lava unharmed."
+material: FIRE_CHARGE
+
+passive:
+  # Fire resistance
+  fire-resistance: true
+  # Allow walking through lava (slowness is still applied by vanilla)
+  lava-walk: true
+  # Water slow effect multiplier (nullified by fire resistance but kept for config)
+  water-speed-multiplier: 0.4
+  # Increased powder snow damage
+  powder-snow-damage-multiplier: 2.0
+
+ability:
+  name: "Inferno Burst"
+  material: BLAZE_ROD
+  description: "Releases a burst of searing flames, igniting nearby enemies."
+  # Ignition duration in seconds
+  ignite-duration: 4
+  # Radius in blocks
+  radius: 5
+  # Potion effect amplifier applied (0 = Fire Resistance level 1 on self, 1 = Poison level 1 on others, etc.)
+  self-fire-resistance-duration: 10
+  self-fire-resistance-amplifier: 0
+  cooldown: 45
+  stage-2:
+    ignite-duration: 6
+    radius: 7
+    cooldown: 35
+  stage-3:
+    ignite-duration: 8
+    radius: 10
+    cooldown: 25
+    self-fire-resistance-duration: 20
+
+evolution:
+  stage-1:
+    name: "Infernal"
+    energy-required: 100
+    essence-required: 0
+    icon: FIRE_CHARGE
+    lore:
+      - "<orange>The flame is your ally.</orange>"
+  stage-2:
+    name: "Magma Lord"
+    energy-required: 150
+    essence-required: 50
+    icon: MAGMA_BLOCK
+    lore:
+      - "<dark_red>Molten earth at your command.</dark_red>"
+      - "<gray>Larger radius and longer ignition.</gray>"
+  stage-3:
+    name: "Cataclysm"
+    energy-required: 200
+    essence-required: 150
+    icon: NETHER_STAR
+    lore:
+      - "<gold>The inferno is infinite.</gold>"
+
+particles:
+  inferno-burst: LAVA
+  enabled: true
