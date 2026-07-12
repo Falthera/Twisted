@@ -107,12 +107,11 @@ public class TwistManager {
         org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.displayName(net.kyori.adventure.text.Component.text(getTwistDisplayName(twist)));
-            meta.lore(java.util.stream.Collectors.toList(
-                getSelectionLore(twist).stream()
-                    .map(s -> net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(
-                        s.replace("<gray>", "§7").replace("<white>", "§f").replace("<green>", "§a").replace("<red>", "§c")))
-                    .toList()
-            ));
+            meta.lore(getSelectionLore(twist).stream()
+                .map(s -> net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(
+                    s.replace("<gray>", "§7").replace("<white>", "§f").replace("<green>", "§a").replace("<red>", "§c")))
+                .toList()
+            );
             item.setItemMeta(meta);
         }
         return item;
@@ -165,13 +164,13 @@ public class TwistManager {
             double angle = (2 * Math.PI / 30) * i;
             double r = 2.0;
             Location l = loc.clone().add(Math.cos(angle) * r, 1.0, Math.sin(angle) * r);
-            l.getWorld().spawnParticle(org.bukkit.Particle.ENCHANTMENT_TABLE, l, 3, 0.1, 0.1, 0.1, 0.04);
+            l.getWorld().spawnParticle(org.bukkit.Particle.ENCHANT, l, 3, 0.1, 0.1, 0.1, 0.04);
             l.getWorld().spawnParticle(org.bukkit.Particle.TOTEM_OF_UNDYING, l, 1, 0.05, 0.05, 0.05, 0.01);
         }
     }
 
     public boolean handleTwistSelection(org.bukkit.entity.Player player, Twist twist) {
-        PlayerData data = plugin.getDataManager().getPlayerData(player.getUniqueId());
+        PlayerData data = plugin.getDataManager().loadPlayerData(player.getUniqueId());
         if (data == null || data.isTwistSelected()) {
             return false;
         }

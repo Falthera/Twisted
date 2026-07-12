@@ -2,7 +2,9 @@ package com.twisted.smp.listeners;
 
 import com.twisted.smp.TwistedSMP;
 import com.twisted.smp.core.ConfigManager;
+import com.twisted.smp.core.DataManager;
 import com.twisted.smp.core.PlayerData;
+import com.twisted.smp.twists.Twist;
 import com.twisted.smp.vfx.ParticlePatterns;
 import com.twisted.smp.vfx.ScreenShake;
 import org.bukkit.Sound;
@@ -16,17 +18,23 @@ import org.bukkit.event.entity.EntityTeleportEvent;
 public class EntityListener implements Listener {
 
     private final TwistedSMP plugin;
+    private final DataManager dataManager;
     private final ConfigManager configManager;
+    private final com.twisted.smp.twists.TwistManager twistManager;
+    private final com.twisted.smp.abilities.AbilityManager abilityManager;
 
-    public EntityListener(TwistedSMP plugin, ConfigManager configManager) {
+    public EntityListener(TwistedSMP plugin, DataManager dataManager, com.twisted.smp.twists.TwistManager twistManager, com.twisted.smp.abilities.AbilityManager abilityManager) {
         this.plugin = plugin;
-        this.configManager = configManager;
+        this.dataManager = dataManager;
+        this.configManager = plugin.getConfigManager();
+        this.twistManager = twistManager;
+        this.abilityManager = abilityManager;
     }
 
     @EventHandler
     public void onEnderTeleport(EntityTeleportEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
-        PlayerData data = plugin.getDataManager().getPlayerData(player.getUniqueId());
+        PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
         if (data == null || !data.isTwistSelected()) return;
 
         if (data.getTwist() == com.twisted.smp.twists.Twist.VOID) {
@@ -40,7 +48,7 @@ public class EntityListener implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
-        PlayerData data = plugin.getDataManager().getPlayerData(player.getUniqueId());
+        PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
         if (data == null || !data.isTwistSelected()) return;
 
         if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
@@ -64,11 +72,11 @@ public class EntityListener implements Listener {
     @EventHandler
     public void onPortalEnter(EntityPortalEnterEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
-        PlayerData data = plugin.getDataManager().getPlayerData(player.getUniqueId());
+        PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
         if (data == null || !data.isTwistSelected()) return;
 
         if (data.getTwist() == com.twisted.smp.twists.Twist.VOID) {
-            event.getEntity().playSound(event.getEntity().getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 1.0f, 0.8f);
+            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 1.0f, 0.8f);
         }
     }
 }

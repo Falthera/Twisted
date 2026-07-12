@@ -7,6 +7,7 @@ import com.twisted.smp.vfx.HologramManager;
 import com.twisted.smp.vfx.ParticlePatterns;
 import com.twisted.smp.vfx.ScreenShake;
 import com.twisted.smp.vfx.SoundDesigner;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -176,8 +177,8 @@ public class TwistedStorm implements Listener {
                 }
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     Location loc = p.getLocation().clone().add(0, 12, 0);
-                    plugin.vfx().holograms().spawnTextHologram(loc, "§8§lTWISTED STORM", 25, NamedTextColor.DARK_GRAY);
-                    plugin.vfx().holograms().spawnTextHologram(loc.clone().add(0, -0.5, 0), "§c§l" + timeRemaining + "s", 25, NamedTextColor.RED);
+                    plugin.vfx().holograms().spawnTextHologram(loc, "§8§lTWISTED STORM", 25, TextColor.color(0x555555));
+                    plugin.vfx().holograms().spawnTextHologram(loc.clone().add(0, -0.5, 0), "§c§l" + timeRemaining + "s", 25, TextColor.color(0xff0000));
                 }
             }
         }.runTaskTimer(plugin, 0L, 15L);
@@ -213,7 +214,7 @@ public class TwistedStorm implements Listener {
             plugin.vfx().shake().shake(p, ScreenShake.Intensity.EXTREME);
             plugin.vfx().sounds().playStormStart(p);
             p.getWorld().playSound(p.getLocation(), Sound.WEATHER_RAIN, 1.5f, 0.5f);
-            plugin.vfx().holograms().spawnTextHologram(p.getLocation().clone().add(0, 6, 0), "§8§lTWISTED STORM", 80, NamedTextColor.DARK_GRAY);
+            plugin.vfx().holograms().spawnTextHologram(p.getLocation().clone().add(0, 6, 0), "§8§lTWISTED STORM", 80, TextColor.color(0x555555));
         }
     }
 
@@ -263,7 +264,7 @@ public class TwistedStorm implements Listener {
             ParticlePatterns.explosion(victim.getLocation().clone().add(0, 0.5, 0), ParticlePatterns.Color.STORM, 2.0f);
             killer.getWorld().playSound(killer.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 1.0f, 0.7f);
 
-            com.twisted.smp.core.PlayerData killerData = energyManager.getPlugin().getDataManager().getPlayerData(killer.getUniqueId());
+            com.twisted.smp.core.PlayerData killerData = energyManager.getPlugin().getDataManager().loadPlayerData(killer.getUniqueId());
             if (killerData == null || !killerData.isTwistSelected()) return;
 
             double baseReward = energyManager.getKillReward();

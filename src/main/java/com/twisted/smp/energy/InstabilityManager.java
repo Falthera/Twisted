@@ -77,7 +77,7 @@ public class InstabilityManager {
 
     public void reduceInstability(PlayerData data, double amount) {
         if (shouldReduceInstability(data)) {
-            data.subtractInstability(amount);
+            data.addInstability(-amount);
         }
     }
 

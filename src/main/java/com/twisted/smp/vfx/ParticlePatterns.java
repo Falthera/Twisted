@@ -34,7 +34,7 @@ public class ParticlePatterns {
             Location l = center.clone().add(x, 0.15, z);
             DustOptions dust = new DustOptions(color.toBukkit(), size);
             center.getWorld().spawnParticle(Particle.DUST, l, 2, 0.03, 0.03, 0.03, 0, dust);
-            center.getWorld().spawnParticle(Particle.SPELL_MOB, l, 1, 0.01, 0.01, 0.01, 0);
+            center.getWorld().spawnParticle(Particle.SPELL_CASTING, l, 1, 0.01, 0.01, 0.01, 0);
         }
     }
 
@@ -49,7 +49,7 @@ public class ParticlePatterns {
             Location l = center.clone().add(x, y, z);
             DustOptions dust = new DustOptions(color.toBukkit(), 1.2f);
             center.getWorld().spawnParticle(Particle.DUST, l, 1, 0.02, 0.02, 0.02, 0, dust);
-            center.getWorld().spawnParticle(Particle.SPELL_MOB, l, 1, 0.01, 0.01, 0.01, 0);
+            center.getWorld().spawnParticle(Particle.SPELL_CASTING, l, 1, 0.01, 0.01, 0.01, 0);
         }
     }
 
@@ -82,7 +82,7 @@ public class ParticlePatterns {
     public static void trail(Location location, Color color) {
         DustOptions dust = new DustOptions(color.toBukkit(), 1.0f);
         location.getWorld().spawnParticle(Particle.DUST, location, 2, 0.1, 0.1, 0.1, 0.01, dust);
-        location.getWorld().spawnParticle(Particle.SPELL_MOB, location, 1, 0.05, 0.05, 0.05, 0);
+        location.getWorld().spawnParticle(Particle.SPELL_CASTING, location, 1, 0.05, 0.05, 0.05, 0);
     }
 
     public static void verticalPillar(Location base, double height, Color color, int durationTicks, org.bukkit.plugin.java.JavaPlugin plugin) {
@@ -143,7 +143,7 @@ public class ParticlePatterns {
                 }
                 tick++;
             }
-        }.runTaskTimer(location.getWorld().getPluginManager().getPlugin("TwistedSMP"), 0L, 1L);
+        }.runTaskTimer(plugin, 0L, 1L);
     }
 
     public enum Color {
@@ -173,7 +173,7 @@ public class ParticlePatterns {
     public enum ParticleType {
         VOID_STEP(org.bukkit.Particle.PORTAL, org.bukkit.Sound.ENTITY_ENDERMAN_TELEPORT),
         EARTHQUAKE(org.bukkit.Particle.CRIT, org.bukkit.Sound.ENTITY_GENERIC_EXPLODE),
-        BLOOD_RAGE(org.bukkit.Particle.VILLAGER_ANGRY, org.bukkit.Sound.ENTITY_BLAZE_AMBIENT),
+        BLOOD_RAGE(org.bukkit.Particle.ANGRY_VILLAGER, org.bukkit.Sound.ENTITY_BLAZE_AMBIENT),
         FADE(org.bukkit.Particle.CLOUD, org.bukkit.Sound.BLOCK_GLASS_BREAK),
         INFERNO(org.bukkit.Particle.FLAME, org.bukkit.Sound.ENTITY_GHAST_SHOOT),
         FREEZE(org.bukkit.Particle.SNOWFLAKE, org.bukkit.Sound.BLOCK_GLASS_BREAK);

@@ -72,7 +72,7 @@ public class RecipeManager {
         ShapedRecipe recipe = new ShapedRecipe(key, createRiftKeyItem());
         recipe.shape("EAE", "ENE", "EAE");
         recipe.setIngredient('E', Material.ECHO_SHARD);
-        recipe.setIngredient('A', Material.EYE_OF_ENDER);
+        recipe.setIngredient('A', Material.ENDER_EYE);
         recipe.setIngredient('N', Material.NETHER_STAR);
         registerRecipe(key, recipe);
     }

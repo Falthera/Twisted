@@ -3,10 +3,11 @@ package com.twisted.smp.abilities;
 import com.twisted.smp.TwistedSMP;
 import com.twisted.smp.core.ConfigManager;
 import com.twisted.smp.core.PlayerData;
+import com.twisted.smp.energy.EnergyManager;
 import com.twisted.smp.vfx.ParticlePatterns;
 import com.twisted.smp.vfx.ScreenShake;
 import com.twisted.smp.vfx.SoundDesigner;
-import com.twisted.smp.vfx.VFXEngine;
+import com.twisted.smp.vfx.VFXManager;
 import com.twisted.smp.twists.Twist;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -22,15 +23,15 @@ public class AbilityManager {
     private final TwistedSMP plugin;
     private final ConfigManager configManager;
     private final Map<Twist, AbstractAbility> abilities = new HashMap<>();
-    private final VFXEngine vfxEngine;
+    private final VFXManager vfxManager;
     private final ScreenShake screenShake;
     private final SoundDesigner soundDesigner;
 
     public AbilityManager(TwistedSMP plugin, ConfigManager configManager) {
         this.plugin = plugin;
         this.configManager = configManager;
-        this.vfxEngine = plugin.vfx();
-        this.screenShake = vfxEngine.shake();
+        this.vfxManager = plugin.vfx();
+        this.screenShake = vfxManager.shake();
         this.soundDesigner = plugin.vfx().sounds();
         registerAbilities();
     }
@@ -45,7 +46,7 @@ public class AbilityManager {
     }
 
     public boolean useAbility(Player player, Twist twist) {
-        PlayerData data = plugin.getDataManager().getPlayerData(player.getUniqueId());
+        PlayerData data = plugin.getDataManager().loadPlayerData(player.getUniqueId());
         if (data == null) return false;
 
         AbstractAbility ability = abilities.get(twist);
@@ -91,7 +92,7 @@ public class AbilityManager {
         return ability != null ? ability.getCooldown(evolutionStage) : 0;
     }
 
-    abstract static class AbstractAbility {
+    abstract class AbstractAbility {
         private final TwistedSMP plugin;
 
         AbstractAbility(TwistedSMP plugin) {
@@ -103,7 +104,7 @@ public class AbilityManager {
         abstract int getCooldown(int evolutionStage);
     }
 
-    static class VoidStepAbility extends AbstractAbility {
+    class VoidStepAbility extends AbstractAbility {
         VoidStepAbility(TwistedSMP plugin) { super(plugin); }
 
         @Override String getName() { return "Void Step"; }
@@ -125,7 +126,7 @@ public class AbilityManager {
                 return false;
             }
 
-            VFXEngine engine = plugin.vfx();
+            VFXManager engine = plugin.vfx();
             ScreenShake shake = engine.shake();
             SoundDesigner sounds = plugin.vfx().sounds();
 
@@ -185,7 +186,7 @@ public class AbilityManager {
         }
     }
 
-    static class EarthquakeAbility extends AbstractAbility {
+    class EarthquakeAbility extends AbstractAbility {
         EarthquakeAbility(TwistedSMP plugin) { super(plugin); }
         @Override String getName() { return "Earthquake"; }
         @Override int getCooldown(int evolutionStage) {
@@ -200,7 +201,7 @@ public class AbilityManager {
             double kby = 0.8 + (stage - 1) * 0.3;
             Location loc = player.getLocation();
 
-            VFXEngine engine = plugin.vfx();
+            VFXManager engine = plugin.vfx();
             ScreenShake shake = engine.shake();
             SoundDesigner sounds = plugin.vfx().sounds();
 
@@ -247,7 +248,7 @@ public class AbilityManager {
         }
     }
 
-    static class BloodRageAbility extends AbstractAbility {
+    class BloodRageAbility extends AbstractAbility {
         BloodRageAbility(TwistedSMP plugin) { super(plugin); }
         @Override String getName() { return "Blood Rage"; }
         @Override int getCooldown(int evolutionStage) {
@@ -261,7 +262,7 @@ public class AbilityManager {
             int strengthLevel = 1 + (stage - 1);
             int speedLevel = 1 + (stage - 1);
 
-            VFXEngine engine = plugin.vfx();
+            VFXManager engine = plugin.vfx();
             ScreenShake shake = engine.shake();
             SoundDesigner sounds = plugin.vfx().sounds();
 
@@ -281,7 +282,7 @@ public class AbilityManager {
             }
 
             ParticlePatterns.vortex(player.getLocation(), 60, ParticlePatterns.Color.BLOOD, 1.5);
-            player.getWorld().spawnParticle(org.bukkit.Particle.REDSTONE, player.getLocation(), 20, 0.7, 0.3, 0.7, 0,
+            player.getWorld().spawnParticle(Particle.DUST, player.getLocation(), 20, 0.7, 0.3, 0.7, 0,
                 new org.bukkit.Particle.DustOptions(org.bukkit.Color.fromRGB(0xe74c3c), 1.0f));
 
             engine.holograms().spawnTextHologram(player.getLocation().clone().add(0, 2.6, 0), "§c§lBLOOD RAGE", duration * 20, ParticlePatterns.Color.BLOOD.toAdventure());
@@ -293,7 +294,7 @@ public class AbilityManager {
                 public void run() {
                     if (!player.isOnline() || ticks >= duration * 20) {
                         cancel();
-                        player.getWorld().spawnParticle(org.bukkit.Particle.SMOKE_LARGE, player.getLocation(), 20, 0.5, 0.5, 0.5, 0.02);
+                        player.getWorld().spawnParticle(Particle.SMOKE, player.getLocation(), 20, 0.5, 0.5, 0.5, 0.02);
                         return;
                     }
 
@@ -312,7 +313,7 @@ public class AbilityManager {
         }
     }
 
-    static class FadeAbility extends AbstractAbility {
+    class FadeAbility extends AbstractAbility {
         FadeAbility(TwistedSMP plugin) { super(plugin); }
         @Override String getName() { return "Fade"; }
         @Override int getCooldown(int evolutionStage) {
@@ -324,7 +325,7 @@ public class AbilityManager {
             int stage = data.getEvolutionStage();
             int duration = 8 + (stage - 1) * 4;
 
-            VFXEngine engine = plugin.vfx();
+            VFXManager engine = plugin.vfx();
             ScreenShake shake = engine.shake();
             SoundDesigner sounds = plugin.vfx().sounds();
 
@@ -344,7 +345,7 @@ public class AbilityManager {
                 double r = 0.8 + Math.sin(i * 0.5) * 0.3;
                 Location l = player.getLocation().add(Math.cos(angle) * r, Math.random() * 0.8, Math.sin(angle) * r);
                 player.getWorld().spawnParticle(org.bukkit.Particle.CLOUD, l, 1, 0.05, 0.05, 0.05, 0.02);
-                player.getWorld().spawnParticle(org.bukkit.Particle.SMOKE_LARGE, l, 1, 0.05, 0.05, 0.05, 0.01);
+                player.getWorld().spawnParticle(Particle.SMOKE, l, 1, 0.05, 0.05, 0.05, 0.01);
             }
 
             engine.holograms().spawnTextHologram(player.getLocation().clone().add(0, 1.8, 0), "§f§lFADE", duration * 20, ParticlePatterns.Color.PHANTOM.toAdventure());
@@ -380,7 +381,7 @@ public class AbilityManager {
         }
     }
 
-    static class InfernoBurstAbility extends AbstractAbility {
+    class InfernoBurstAbility extends AbstractAbility {
         InfernoBurstAbility(TwistedSMP plugin) { super(plugin); }
         @Override String getName() { return "Inferno Burst"; }
         @Override int getCooldown(int evolutionStage) {
@@ -393,7 +394,7 @@ public class AbilityManager {
             int radius = 5 + (stage - 1) * 2;
             int igniteDuration = 4 + (stage - 1) * 2;
 
-            VFXEngine engine = plugin.vfx();
+            VFXManager engine = plugin.vfx();
             ScreenShake shake = engine.shake();
             SoundDesigner sounds = plugin.vfx().sounds();
 
@@ -451,7 +452,7 @@ public class AbilityManager {
         }
     }
 
-    static class FreezeAbility extends AbstractAbility {
+    class FreezeAbility extends AbstractAbility {
         FreezeAbility(TwistedSMP plugin) { super(plugin); }
         @Override String getName() { return "Freeze"; }
         @Override int getCooldown(int evolutionStage) {
@@ -467,7 +468,7 @@ public class AbilityManager {
 
             boolean freezeSelf = stage >= 3;
 
-            VFXEngine engine = plugin.vfx();
+            VFXManager engine = plugin.vfx();
             ScreenShake shake = engine.shake();
             SoundDesigner sounds = plugin.vfx().sounds();
             Location loc = player.getLocation();
@@ -510,7 +511,7 @@ public class AbilityManager {
                 double z = (Math.random() - 0.5) * 1.0;
                 Location l = center.clone().add(x, y, z);
                 center.getWorld().spawnParticle(org.bukkit.Particle.SNOWFLAKE, l, 1, 0.05, 0.05, 0.05, 0.03);
-                center.getWorld().spawnParticle(org.bukkit.Particle.ITEM_CRACK, l, 1, 0.05, 0.05, 0.05, 0, new org.bukkit.inventory.ItemStack(org.bukkit.Material.ICE));
+                center.getWorld().spawnParticle(org.bukkit.Particle.BLOCK_CRUMBLE, l, 1, 0.05, 0.05, 0.05, 0, new org.bukkit.inventory.ItemStack(org.bukkit.Material.ICE));
             }
         }
 

@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.UUID;
 
 public class VFXManager {
 
@@ -52,6 +53,10 @@ public class VFXManager {
     public void onQuit(Player player) {
         if (!enabled()) return;
         engine.untrack(player.getUniqueId());
+    }
+
+    public void untrack(UUID uuid) {
+        engine.untrack(uuid);
     }
 
     public void clearAll() {

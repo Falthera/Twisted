@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -25,7 +26,7 @@ public class HologramManager {
     public void spawnTextHologram(Location location, String text, int durationTicks, TextColor color) {
         if (location == null || location.getWorld() == null) return;
 
-        Display display = (Display) location.getWorld().spawnEntity(location.toHighestLocation(1), EntityType.TEXT_DISPLAY);
+        Display display = (Display) location.getWorld().spawnEntity(location.clone().add(0, 1, 0), EntityType.TEXT_DISPLAY);
         if (display == null) return;
 
         Component comp = Component.text(text).color(color != null ? color : NamedTextColor.WHITE);
@@ -34,7 +35,6 @@ public class HologramManager {
         display.setBillboard(Display.Billboard.CENTER);
         display.setShadowRadius(0.12f);
         display.setShadowStrength(1.0f);
-        display.setSeeThrough(false);
         display.setBrightness(new Display.Brightness(15, 15));
 
         track(display);
@@ -90,7 +90,7 @@ public class HologramManager {
     private void spawnLightBeam(Location location, double offset) {
         TextDisplay beam = (TextDisplay) location.getWorld().spawnEntity(location, EntityType.TEXT_DISPLAY);
         if (beam == null) return;
-        Component comp = Component.text("|").color(TextColor.color(0x55ffff)).font(net.kyori.adventure.text.format.NamedTextColor.WHITE);
+        Component comp = Component.text("|").color(TextColor.color(0x55ffff));
         beam.customName(comp);
         beam.setCustomNameVisible(true);
         beam.setBillboard(Display.Billboard.VERTICAL);

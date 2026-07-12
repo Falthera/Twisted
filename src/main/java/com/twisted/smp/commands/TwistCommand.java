@@ -63,12 +63,12 @@ public class TwistCommand implements CommandExecutor, TabCompleter {
         if (!(sender instanceof Player player)) return;
         Component message = Component.text("TwistedSMP Commands", NamedTextColor.GOLD)
             .append(Component.newline())
-            .append(Component.text("/twist gui", NamedTextColor.YELLOW).hoverEvent(HoverEvent.text(Component.text("Open twist selection GUI"))).append(Component.space()))
-            .append(Component.text("/twist stats", NamedTextColor.YELLOW).hoverEvent(HoverEvent.text(Component.text("View your stats"))).append(Component.space()))
+            .append(Component.text("/twist gui", NamedTextColor.YELLOW).hoverEvent(HoverEvent.showText(Component.text("Open twist selection GUI"))).append(Component.space()))
+            .append(Component.text("/twist stats", NamedTextColor.YELLOW).hoverEvent(HoverEvent.showText(Component.text("View your stats"))).append(Component.space()))
             .append(Component.newline())
-            .append(Component.text("/twist ability", NamedTextColor.YELLOW).hoverEvent(HoverEvent.text(Component.text("Use your Twist ability"))))
-            .append(Component.text("/twist evolve", NamedTextColor.YELLOW).hoverEvent(HoverEvent.text(Component.text("Evolve your Twist"))))
-            .append(Component.text("/twist withdraw <amount>", NamedTextColor.YELLOW).hoverEvent(HoverEvent.text(Component.text("Convert essence to items"))));
+            .append(Component.text("/twist ability", NamedTextColor.YELLOW).hoverEvent(HoverEvent.showText(Component.text("Use your Twist ability"))))
+            .append(Component.text("/twist evolve", NamedTextColor.YELLOW).hoverEvent(HoverEvent.showText(Component.text("Evolve your Twist"))))
+            .append(Component.text("/twist withdraw <amount>", NamedTextColor.YELLOW).hoverEvent(HoverEvent.showText(Component.text("Convert essence to items"))));
         player.sendMessage(message);
     }
 
@@ -77,7 +77,7 @@ public class TwistCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>Players only."));
             return;
         }
-        PlayerData data = plugin.getDataManager().getPlayerData(player.getUniqueId());
+        PlayerData data = plugin.getDataManager().loadPlayerData(player.getUniqueId());
         if (data == null) {
             player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Data not loaded."));
             return;
@@ -113,7 +113,7 @@ public class TwistCommand implements CommandExecutor, TabCompleter {
 
     private void handleAbility(CommandSender sender) {
         if (!(sender instanceof Player player)) return;
-        PlayerData data = plugin.getDataManager().getPlayerData(player.getUniqueId());
+        PlayerData data = plugin.getDataManager().loadPlayerData(player.getUniqueId());
         if (data == null || !data.isTwistSelected()) {
             player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You have not selected a twist yet! Use /twist gui"));
             return;
@@ -123,7 +123,7 @@ public class TwistCommand implements CommandExecutor, TabCompleter {
 
     private void handleEvolve(CommandSender sender) {
         if (!(sender instanceof Player player)) return;
-        PlayerData data = plugin.getDataManager().getPlayerData(player.getUniqueId());
+        PlayerData data = plugin.getDataManager().loadPlayerData(player.getUniqueId());
         if (data == null || !data.isTwistSelected()) {
             player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You have not selected a twist yet! Use /twist gui"));
             return;
@@ -138,7 +138,7 @@ public class TwistCommand implements CommandExecutor, TabCompleter {
 
     private void handleWithdraw(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) return;
-        PlayerData data = plugin.getDataManager().getPlayerData(player.getUniqueId());
+        PlayerData data = plugin.getDataManager().loadPlayerData(player.getUniqueId());
         if (data == null || !data.isTwistSelected()) {
             player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You have not selected a twist yet! Use /twist gui"));
             return;
@@ -168,7 +168,7 @@ public class TwistCommand implements CommandExecutor, TabCompleter {
 
         if (data.getEssence() < amount) {
             player.sendMessage(MiniMessage.miniMessage().deserialize(
-                configManager.getMessage("withdraw-fail", "amount", String.valueOf((int) amount))));
+                plugin.getConfigManager().getMessage("withdraw-fail", "amount", String.valueOf((int) amount))));
             return;
         }
 
@@ -187,12 +187,12 @@ public class TwistCommand implements CommandExecutor, TabCompleter {
         }
         player.getInventory().addItem(item);
         player.sendMessage(MiniMessage.miniMessage().deserialize(
-            configManager.getMessage("withdraw-success", "amount", String.valueOf((int) amount))));
+            plugin.getConfigManager().getMessage("withdraw-success", "amount", String.valueOf((int) amount))));
     }
 
     private void handleGUI(CommandSender sender) {
         if (!(sender instanceof Player player)) return;
-        PlayerData data = plugin.getDataManager().getPlayerData(player.getUniqueId());
+        PlayerData data = plugin.getDataManager().loadPlayerData(player.getUniqueId());
         if (data == null) return;
         if (data.isTwistSelected()) {
             player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You have already selected a twist: " + twistManager.getTwistDisplayName(data.getTwist())));

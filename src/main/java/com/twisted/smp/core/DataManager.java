@@ -14,7 +14,7 @@ public class DataManager {
     private final DatabaseManager databaseManager;
     private final ConfigManager configManager;
     private final Map<UUID, PlayerData> cache = new ConcurrentHashMap<>();
-    private final Set<UUID> saving = new java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private final Set<UUID> saving = ConcurrentHashMap.newKeySet();
 
     public DataManager(TwistedSMP plugin, DatabaseManager databaseManager, ConfigManager configManager) {
         this.plugin = plugin;
@@ -183,6 +183,18 @@ public class DataManager {
         } catch (Exception e) {
             // ignore
         }
+    }
+
+    public PlayerData getPlayerData(UUID uuid) {
+        return cache.get(uuid);
+    }
+
+    public PlayerData getOrCreatePlayerData(UUID uuid) {
+        return cache.computeIfAbsent(uuid, this::loadPlayerData);
+    }
+
+    public Set<UUID> getPlayerDataCache() {
+        return cache.keySet();
     }
 
     public void shutdown() {

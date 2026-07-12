@@ -30,10 +30,14 @@ public class WorldListener implements Listener {
 
     private final TwistedSMP plugin;
     private final ConfigManager configManager;
+    private final com.twisted.smp.twists.TwistManager twistManager;
+    private final com.twisted.smp.abilities.AbilityManager abilityManager;
 
-    public WorldListener(TwistedSMP plugin, ConfigManager configManager) {
+    public WorldListener(TwistedSMP plugin, ConfigManager configManager, com.twisted.smp.twists.TwistManager twistManager, com.twisted.smp.abilities.AbilityManager abilityManager) {
         this.plugin = plugin;
         this.configManager = configManager;
+        this.twistManager = twistManager;
+        this.abilityManager = abilityManager;
     }
 
     @EventHandler

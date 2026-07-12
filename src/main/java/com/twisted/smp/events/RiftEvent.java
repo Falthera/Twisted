@@ -24,7 +24,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
 import org.bukkit.Sound;
+import org.bukkit.Color;
 
 import java.util.List;
 import java.util.Map;
@@ -193,7 +195,7 @@ public class RiftEvent implements Listener {
                         block.setType(netherrackMat, false);
                         placedBlocks.put(loc.clone(), netherrackMat);
                         if (Math.abs(x) == 1 && Math.abs(z) == 1 && y == 1) {
-                            block.getRelative(Block.UP, 1).setType(fireMat, false);
+                            block.getRelative(org.bukkit.block.BlockFace.UP).setType(fireMat, false);
                             placedBlocks.put(loc.clone().add(0, 1, 0), fireMat);
                         }
                     }
@@ -263,7 +265,7 @@ public class RiftEvent implements Listener {
                 double min = ((Number) map.get("min")).doubleValue();
                 double max = ((Number) map.get("max")).doubleValue();
                 double amount = min + random.nextDouble() * (max - min);
-                PlayerData data = dataManager.getPlayerData(player.getUniqueId());
+                PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
                 if (data != null) {
                     data.addEssence(amount);
                     dataManager.savePlayerData(data, true);

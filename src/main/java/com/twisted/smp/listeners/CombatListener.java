@@ -67,7 +67,7 @@ public class CombatListener implements Listener {
             victim.getWorld().playSound(victim.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 0.6f, 0.5f);
 
             ParticlePatterns.ringBurst(deathLoc, 1.8, 24, ParticlePatterns.Color.BLOOD, 1.2f);
-            victim.getWorld().spawnParticle(Particle.SMOKE_LARGE, deathLoc, 12, 0.6, 0.6, 0.6, 0.04);
+            victim.getWorld().spawnParticle(Particle.LARGE_SMOKE, deathLoc, 12, 0.6, 0.6, 0.6, 0.04);
             victim.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, deathLoc, 10, 0.8, 0.8, 0.8, 0);
 
             if (killerData.isTwistSelected()) {
@@ -122,13 +122,13 @@ public class CombatListener implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player victim)) return;
 
-        PlayerData victimData = dataManager.getPlayerData(victim.getUniqueId());
+        PlayerData victimData = dataManager.loadPlayerData(victim.getUniqueId());
         if (victimData == null || !victimData.isTwistSelected()) return;
 
         double damage = event.getFinalDamage();
 
         if (event.getDamager() instanceof Player attacker) {
-            PlayerData attackerData = dataManager.getPlayerData(attacker.getUniqueId());
+            PlayerData attackerData = dataManager.loadPlayerData(attacker.getUniqueId());
             double multiplier = 1.0;
             if (attackerData != null && attackerData.isTwistSelected()) {
                 multiplier *= plugin.getEnergyManager().getEffectivenessMultiplier(attackerData.getTwist(), attackerData.getEnergy());
@@ -150,7 +150,7 @@ public class CombatListener implements Listener {
     @EventHandler
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
         if (!(event.getEntity().getShooter() instanceof Player shooter)) return;
-        PlayerData data = dataManager.getPlayerData(shooter.getUniqueId());
+        PlayerData data = dataManager.loadPlayerData(shooter.getUniqueId());
         if (data == null || !data.isTwistSelected()) return;
 
         if (data.getTwist() == Twist.TITAN) {

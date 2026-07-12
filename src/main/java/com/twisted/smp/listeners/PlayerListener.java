@@ -69,7 +69,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        PlayerData data = dataManager.getPlayerData(player.getUniqueId());
+        PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
         if (data != null) {
             data.purgeExpiredCooldowns();
             dataManager.savePlayerData(data, false);
@@ -121,7 +121,7 @@ public class PlayerListener implements Listener {
     public void onPickup(EntityPickupItemEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
         Item itemEntity = event.getItem();
-        PlayerData data = dataManager.getPlayerData(player.getUniqueId());
+        PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
         if (data == null || !data.isTwistSelected()) return;
 
         if (data.getTwist() == Twist.BERSERKER) {
@@ -136,7 +136,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onHungerChange(FoodLevelChangeEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
-        PlayerData data = dataManager.getPlayerData(player.getUniqueId());
+        PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
         if (data == null || !data.isTwistSelected()) return;
 
         if (data.getTwist() == Twist.BERSERKER) {
@@ -150,7 +150,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
         Player player = event.getPlayer();
-        PlayerData data = dataManager.getPlayerData(player.getUniqueId());
+        PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
         if (data == null || !data.isTwistSelected() || data.getTwist() != Twist.VOID) return;
 
         Location from = event.getFrom();

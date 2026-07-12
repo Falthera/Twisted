@@ -44,7 +44,7 @@ public class SoundDesigner {
                 break;
             case FREEZE:
                 loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.2f, 0.35f);
-                loc.getWorld().playSound(loc, Sound.BLOCK_ICE_BREAK, 1.0f, 0.8f);
+                loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.0f, 0.8f);
                 loc.getWorld().playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, 0.8f, 1.0f);
                 break;
         }

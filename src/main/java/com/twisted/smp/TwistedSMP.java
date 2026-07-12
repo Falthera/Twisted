@@ -15,6 +15,8 @@ import com.twisted.smp.energy.InstabilityManager;
 import com.twisted.smp.placeholders.TwistedSMPExpansion;
 import com.twisted.smp.twists.Twist;
 import com.twisted.smp.twists.TwistManager;
+import com.twisted.smp.commands.TwistCommand;
+import com.twisted.smp.commands.TwistAdminCommand;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;

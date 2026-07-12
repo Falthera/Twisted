@@ -48,7 +48,7 @@ public class TwistedSMPExpansion extends PlaceholderExpansion {
         if (player == null) {
             return "";
         }
-        PlayerData data = dataManager.getPlayerData(player.getUniqueId());
+        PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
         if (data == null) {
             return "0";
         }

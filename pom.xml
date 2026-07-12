@@ -88,6 +88,12 @@
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-api</artifactId>
+            <version>${adventure.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
             <artifactId>adventure-platform-bukkit</artifactId>
             <version>4.4.1</version>
             <scope>provided</scope>
@@ -95,10 +101,6 @@
                 <exclusion>
                     <groupId>net.kyori</groupId>
                     <artifactId>adventure-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.kyori</groupId>
-                    <artifactId>adventure-platform-api</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>net.kyori</groupId>
