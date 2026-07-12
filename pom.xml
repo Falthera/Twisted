@@ -52,6 +52,11 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>net.kyori</groupId>
+                <artifactId>adventure-platform-api</artifactId>
+                <version>4.4.1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -89,7 +94,7 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-platform-api</artifactId>
-            <version>${adventure.version}</version>
+            <version>4.4.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
