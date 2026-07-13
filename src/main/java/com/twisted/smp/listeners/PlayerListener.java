@@ -186,6 +186,14 @@ public class PlayerListener implements Listener {
         if (maxHealth != null) {
             maxHealth.setBaseValue(20.0);
         }
+        org.bukkit.attribute.AttributeInstance speed = player.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MOVEMENT_SPEED);
+        if (speed != null) {
+            speed.setBaseValue(0.1);
+        }
+        org.bukkit.attribute.AttributeInstance kb = player.getAttribute(org.bukkit.attribute.Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+        if (kb != null) {
+            kb.setBaseValue(0.0);
+        }
         player.removePotionEffect(org.bukkit.potion.PotionEffectType.NIGHT_VISION);
         player.removePotionEffect(org.bukkit.potion.PotionEffectType.FIRE_RESISTANCE);
     }
@@ -204,9 +212,23 @@ public class PlayerListener implements Listener {
                     org.bukkit.potion.PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 0, false, false));
             }
             case TITAN -> {
+                org.bukkit.configuration.ConfigurationSection config = plugin.getConfigManager().getTwistConfig("titan");
+                double extraHearts = config != null ? config.getDouble("passive.extra-hearts", 4) : 4;
                 org.bukkit.attribute.AttributeInstance maxHealth = player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH);
                 if (maxHealth != null) {
-                    maxHealth.setBaseValue(20 + (data.getEvolutionStage() * 4));
+                    maxHealth.setBaseValue(20 + extraHearts + ((data.getEvolutionStage() - 1) * extraHearts));
+                }
+                double kbResist = config != null ? config.getDouble("passive.knockback-resistance", 0.0) : 0.0;
+                org.bukkit.attribute.AttributeInstance kb = player.getAttribute(org.bukkit.attribute.Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+                if (kb != null) {
+                    kb.setBaseValue(kbResist);
+                }
+                double speedMult = config != null ? config.getDouble("passive.movement-speed-multiplier", 1.0) : 1.0;
+                if (speedMult != 1.0) {
+                    org.bukkit.attribute.AttributeInstance speed = player.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MOVEMENT_SPEED);
+                    if (speed != null) {
+                        speed.setBaseValue(0.1 * speedMult);
+                    }
                 }
             }
             default -> {}

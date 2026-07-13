@@ -181,6 +181,11 @@ public class AbilityManager {
                         kb.multiply(1.0 - (distance / radius) * 0.5);
                         target.setVelocity(kb);
 
+                        if (target instanceof org.bukkit.entity.Player p) {
+                            long shieldDisableTicks = Math.min(100, 40 + (stage - 1) * 20);
+                            p.disableShield(shieldDisableTicks);
+                        }
+
                         ParticlePatterns.damageNumber(target.getLocation().clone().add(0, 1, 0), damage, ParticlePatterns.Color.EARTH, plugin);
                         target.getWorld().playSound(target.getLocation(), Sound.BLOCK_STONE_BREAK, 0.7f, 0.8f);
                     }
