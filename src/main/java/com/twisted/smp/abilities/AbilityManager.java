@@ -120,11 +120,6 @@ public class AbilityManager {
             Vector direction = loc.getDirection().normalize();
             Location target = loc.clone().add(direction.multiply(range));
             if (target.getY() < -64) target.setY(loc.getY());
-            if (!isSafe(target)) {
-                player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()
-                    .deserialize("<red>Cannot teleport there! Location not safe."));
-                return false;
-            }
 
             VFXManager engine = plugin.vfx();
             ScreenShake shake = engine.shake();
@@ -135,8 +130,6 @@ public class AbilityManager {
 
             player.getWorld().playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.2f);
             player.getWorld().spawnParticle(Particle.PORTAL, loc, 30, 0.8, 0.8, 0.8, 0.08);
-
-            pathTrail(loc, target, player);
 
             player.teleport(target);
 
@@ -153,36 +146,6 @@ public class AbilityManager {
             }
 
             return true;
-        }
-
-        private void pathTrail(Location from, Location to, Player player) {
-            Location current = from.clone();
-            Vector dir = to.clone().subtract(from).toVector().normalize();
-            double distance = from.distance(to);
-            int points = (int) Math.max(10, distance * 1.5);
-
-            new org.bukkit.scheduler.BukkitRunnable() {
-                int step = 0;
-
-                @Override
-                public void run() {
-                    if (step >= points) {
-                        cancel();
-                        return;
-                    }
-                    double progress = (double) step / points;
-                    Location l = from.clone().add(dir.clone().multiply(distance * progress));
-                    if (l.getY() < -63) l.setY(-62);
-                    ParticlePatterns.trail(l, ParticlePatterns.Color.VOID);
-                    l.getWorld().playSound(l, Sound.BLOCK_PORTAL_TRAVEL, 0.4f, 1.5f + step * 0.01f);
-                    step++;
-                }
-            }.runTaskTimer(plugin, 0L, 1L);
-        }
-
-        private boolean isSafe(Location loc) {
-            return loc.getBlock().getType().isAir() &&
-                   loc.getBlock().getRelative(org.bukkit.block.BlockFace.DOWN).getType().isSolid();
         }
     }
 
