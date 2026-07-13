@@ -56,12 +56,17 @@ public class PlayerListener implements Listener {
 
         data.writeToPersistentData(player.getPersistentDataContainer());
 
-        if (!data.isTwistSelected() && !player.hasPlayedBefore()) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if (player.isOnline()) {
-                    twistManager.openTwistSelectionGUI(player);
-                }
-            }, 40L);
+        if (!data.isTwistSelected()) {
+            if (!player.hasPlayedBefore()) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (player.isOnline()) {
+                        twistManager.openTwistSelectionGUI(player);
+                    }
+                }, 40L);
+            } else {
+                Twist randomTwist = Twist.getRandomTwists(1).get(0);
+                twistManager.handleTwistSelection(player, randomTwist);
+            }
         }
 
         refreshPassiveEffects(player, data);

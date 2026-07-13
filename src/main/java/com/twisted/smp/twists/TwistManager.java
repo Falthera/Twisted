@@ -133,7 +133,7 @@ public class TwistManager {
 
         java.util.List<Twist> choices = java.util.Collections.emptyList();
         if (!data.isTwistSelected()) {
-            choices = Twist.getRandomTwists(5);
+            choices = Twist.getRandomTwists(Twist.getAllTwists().size());
         }
 
         org.bukkit.inventory.Inventory inv = org.bukkit.Bukkit.createInventory(null, 27, "§5Select Your Twist");
