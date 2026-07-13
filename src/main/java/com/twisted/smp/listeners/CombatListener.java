@@ -125,7 +125,7 @@ public class CombatListener implements Listener {
         PlayerData victimData = dataManager.loadPlayerData(victim.getUniqueId());
         if (victimData == null || !victimData.isTwistSelected()) return;
 
-        double damage = event.getFinalDamage();
+        double damage = event.getDamage();
 
         if (event.getDamager() instanceof Player attacker) {
             PlayerData attackerData = dataManager.loadPlayerData(attacker.getUniqueId());
@@ -139,9 +139,7 @@ public class CombatListener implements Listener {
                 multiplier *= 0.7;
             }
             event.setDamage(damage * multiplier);
-        }
-
-        if (event.getDamager() instanceof org.bukkit.entity.Projectile projectile) {
+        } else if (event.getDamager() instanceof org.bukkit.entity.Projectile projectile) {
             double multiplier = victimData.getTwist() == Twist.VOID ? 1.5 : 1.0;
             event.setDamage(damage * multiplier);
         }
