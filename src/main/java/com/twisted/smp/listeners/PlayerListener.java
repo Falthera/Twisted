@@ -258,6 +258,16 @@ public class PlayerListener implements Listener {
             event.setCancelled(true);
             return;
         }
+
+        org.bukkit.Material abilityMat = null;
+        if (data.getTwist() == Twist.VOID) {
+            abilityMat = org.bukkit.Material.CHORUS_FRUIT;
+        }
+        if (abilityMat != null && item.getType() == abilityMat) {
+            event.setCancelled(true);
+            plugin.getAbilityManager().useAbility(player, data.getTwist());
+            return;
+        }
     }
 
     public void refreshPassiveEffects(Player player, PlayerData data) {
