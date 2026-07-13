@@ -74,13 +74,13 @@ public final class TwistedSMP extends JavaPlugin {
 
         dataManager = new DataManager(this, databaseManager, configManager);
         twistManager = new TwistManager(this);
+        vfxManager = new com.twisted.smp.vfx.VFXManager(this, configManager);
         abilityManager = new AbilityManager(this, configManager);
         evolutionManager = new EvolutionManager(this, configManager, dataManager, twistManager);
         energyManager = new com.twisted.smp.energy.EnergyManager(this, configManager);
         essenceManager = new EssenceManager(this, configManager);
         instabilityManager = new InstabilityManager(this, configManager);
         recipeManager = new RecipeManager(this, configManager);
-        vfxManager = new com.twisted.smp.vfx.VFXManager(this, configManager);
         twistManager.loadTwistConfigs();
         recipeManager.registerRecipes();
         twistedStorm = new TwistedStorm(this, configManager, dataManager, energyManager, instabilityManager);
