@@ -20,7 +20,7 @@ public class ScoreboardManager {
         PlayerData data = plugin.getDataManager().getPlayerData(player.getUniqueId());
         if (data == null || !data.isTwistSelected()) {
             org.bukkit.scoreboard.Scoreboard board = player.getServer().getScoreboardManager().getMainScoreboard();
-            if (board != null) player.scoreboard(board);
+            if (board != null) player.setScoreboard(board);
             return;
         }
 
@@ -47,7 +47,7 @@ public class ScoreboardManager {
         line(obj, "§7Stage: §e" + data.getEvolutionStage(), 6);
         line(obj, "§1 ", 5);
 
-        player.scoreboard(board);
+        player.setScoreboard(board);
     }
 
     private void line(Objective obj, String text, int score) {

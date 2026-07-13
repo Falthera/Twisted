@@ -506,51 +506,6 @@ public class AbilityManager {
             return true;
         }
 
-        @Override
-        boolean execute(Player player, PlayerData data) {
-            int stage = data.getEvolutionStage();
-            int radius = 5 + (stage - 1) * 2;
-            int slownessLevel = stage * 2;
-            if (slownessLevel > 10) slownessLevel = 10;
-
-            boolean freezeSelf = stage >= 3;
-
-            VFXManager engine = plugin.vfx();
-            ScreenShake shake = engine.shake();
-            SoundDesigner sounds = plugin.vfx().sounds();
-            Location loc = player.getLocation();
-
-            shake.shake(player, ScreenShake.Intensity.LIGHT);
-            shake.shakeNearby(loc, radius + 4, ScreenShake.Intensity.LIGHT);
-            sounds.playAbilitySound(loc, SoundDesigner.SoundDesign.FREEZE, stage >= 2);
-            player.getWorld().playSound(loc, Sound.BLOCK_GLASS_HIT, 1.0f, 1.2f);
-
-            for (org.bukkit.entity.Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
-                if (e instanceof LivingEntity target && !target.isDead()) {
-                    if (target == player && !freezeSelf) continue;
-                    int amplifier = Math.max(0, slownessLevel - 1);
-                    target.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                        org.bukkit.potion.PotionEffectType.SLOWNESS, 80, amplifier, false, false));
-                    target.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                        org.bukkit.potion.PotionEffectType.MINING_FATIGUE, 40, 0, false, false));
-                    particleFreezeHit(target.getLocation().add(0, 0.8, 0), 20);
-                }
-            }
-
-            ParticlePatterns.explosion(loc, ParticlePatterns.Color.FROST, 1.6f);
-            ParticlePatterns.ringBurst(loc, radius, 56, ParticlePatterns.Color.FROST, 2.0f);
-            player.getWorld().spawnParticle(org.bukkit.Particle.SNOWFLAKE, loc, 40, radius, 2, radius, 0.08);
-            particleIceFloor(loc, radius);
-
-            engine.holograms().spawnTextHologram(loc.clone().add(0, 2.2, 0), "§b§lFREEZE", 40, ParticlePatterns.Color.FROST.toAdventure());
-
-            if (stage >= 2) {
-                engine.holograms().spawnTextHologram(loc.clone().add(0, 3.0, 0), "§f§lFROST NEXUS", 55, ParticlePatterns.Color.FROST.toAdventure());
-            }
-
-            return true;
-        }
-
         private void particleFreezeHit(Location center, int count) {
             for (int i = 0; i < count; i++) {
                 double x = (Math.random() - 0.5) * 1.0;

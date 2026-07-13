@@ -19,8 +19,10 @@ import com.twisted.smp.twists.TwistManager;
 import com.twisted.smp.commands.TwistCommand;
 import com.twisted.smp.commands.TwistAdminCommand;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
@@ -135,9 +137,8 @@ public final class TwistedSMP extends JavaPlugin {
                 }
                 if (data.getTwist() == com.twisted.smp.twists.Twist.FROSTBORN) {
                     org.bukkit.World.Environment env = online.getWorld().getEnvironment();
-                    boolean cold = env == org.bukkit.World.Environment.NORMAL &&
-                        (online.getLocation().getBlock().getTemperature() < 0.15 ||
-                         online.getWorld().getBiome(online.getLocation()).getTemperature() < 0.15);
+                    double temp = online.getLocation().getBlock().getTemperature();
+                    boolean cold = env == org.bukkit.World.Environment.NORMAL && temp < 0.15;
                     if (cold) {
                         online.addPotionEffect(new org.bukkit.potion.PotionEffect(
                             org.bukkit.potion.PotionEffectType.SLOWNESS, 40, 0, false, false));
@@ -152,7 +153,7 @@ public final class TwistedSMP extends JavaPlugin {
                 if (data == null || !data.isTwistSelected()) continue;
 
                 if (data.getTwist() == com.twisted.smp.twists.Twist.VOID && online.getLocation().getBlock().getLightLevel() < 4) {
-                    plugin.getEnergyManager().addEnergy(data, 0.3);
+                    getEnergyManager().addEnergy(data, 0.3);
                 }
 
                 ItemStack mainHand = online.getInventory().getItemInMainHand();
@@ -160,13 +161,13 @@ public final class TwistedSMP extends JavaPlugin {
                 boolean hasCrown = hasNamedItem(mainHand, "Verity Crown") || hasNamedItem(offHand, "Verity Crown");
                 boolean hasFocus = hasNamedItem(mainHand, "Verity Focus") || hasNamedItem(offHand, "Verity Focus");
                 if (hasCrown) {
-                    plugin.getEnergyManager().addEnergy(data, 0.4);
+                    getEnergyManager().addEnergy(data, 0.4);
                 }
                 if (hasFocus && data.getInstability() > 0) {
                     data.subtractInstability(0.05);
                 }
                 if (hasCrown || hasFocus) {
-                    plugin.getDataManager().savePlayerData(data, false);
+                    getDataManager().savePlayerData(data, false);
                 }
 
                 if (scoreboardManager != null) {

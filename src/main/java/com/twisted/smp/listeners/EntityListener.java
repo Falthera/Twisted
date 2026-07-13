@@ -13,7 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
-import org.bukkit.event.entity.RegainHealthEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.Random;
@@ -98,21 +97,6 @@ public class EntityListener implements Listener {
 
         if (data.getTwist() == com.twisted.smp.twists.Twist.VOID) {
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 1.0f, 0.8f);
-        }
-    }
-
-    @EventHandler
-    public void onRegainHealth(RegainHealthEvent event) {
-        if (!(event.getEntity() instanceof Player player)) return;
-        PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
-        if (data == null || !data.isTwistSelected()) return;
-
-        if (data.getTwist() == Twist.BERSERKER && event.getRegainReason() == RegainHealthEvent.RegainReason.SATIATED) {
-            org.bukkit.configuration.ConfigurationSection berserkerConfig = configManager.getTwistConfig("berserker");
-            double regenReduction = berserkerConfig != null ? berserkerConfig.getDouble("passive.natural-regen-reduction", 0.5) : 0.5;
-            if (random.nextDouble() < regenReduction) {
-                event.setCancelled(true);
-            }
         }
     }
 }

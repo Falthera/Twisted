@@ -464,7 +464,7 @@ public class PlayerListener implements Listener {
                         org.bukkit.potion.PotionEffectType.MINING_FATIGUE, Integer.MAX_VALUE, (int) Math.ceil((1.0 - miningMult) * 3), false, false));
                 } else if (miningMult > 1.0) {
                     player.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                        org.bukkit.potion.PotionEffectType.FAST_DIGGING, Integer.MAX_VALUE, (int) Math.floor(miningMult - 1), false, false));
+                        org.bukkit.potion.PotionEffectType.DIG_SPEED, Integer.MAX_VALUE, (int) Math.floor(miningMult - 1), false, false));
                 }
             }
             default -> {}

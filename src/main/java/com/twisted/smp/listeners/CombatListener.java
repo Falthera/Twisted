@@ -202,8 +202,12 @@ public class CombatListener implements Listener {
             double rangeMult = voidConfig != null ? voidConfig.getDouble("passive.pearl-range-multiplier", 2.0) : 2.0;
             double cdReduction = voidConfig != null ? voidConfig.getDouble("passive.pearl-cooldown-reduction", 0.5) : 0.5;
             event.getEntity().setVelocity(event.getEntity().getVelocity().multiply(rangeMult));
-            int baseCooldown = ((org.bukkit.entity.EnderPearl) event.getEntity()).getCooldown();
-            ((org.bukkit.entity.EnderPearl) event.getEntity()).setCooldown((int) (baseCooldown * (1.0 - cdReduction)));
+            org.bukkit.entity.Player shooter = getProjectileShooter((org.bukkit.entity.Projectile) event.getEntity());
+            if (shooter != null) {
+                int baseCooldown = 100; // Paper ender pearl cooldown is 100 ticks
+                int reducedCooldown = (int) (baseCooldown * (1.0 - cdReduction));
+                shooter.setCooldown(org.bukkit.Material.ENDER_PEARL, reducedCooldown);
+            }
         }
     }
 }
