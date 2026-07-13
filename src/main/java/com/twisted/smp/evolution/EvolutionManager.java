@@ -86,6 +86,8 @@ public class EvolutionManager {
             player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()
                 .deserialize(configManager.getMessage("evolution-success", "new_name", newName)));
 
+            plugin.getPlayerListener().refreshPassiveEffects(player, data);
+
             if (nextStage == 3) {
                 hologramTitleRing(player, loc);
             }

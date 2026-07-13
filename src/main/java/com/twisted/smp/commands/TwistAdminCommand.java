@@ -63,6 +63,7 @@ public class TwistAdminCommand implements CommandExecutor, TabCompleter {
         data.setTwist(twist);
         data.setTwistSelected(true);
         plugin.getDataManager().savePlayerData(data, true);
+        plugin.getPlayerListener().refreshPassiveEffects(target, data);
         sender.sendMessage(MiniMessage.miniMessage().deserialize(
             configManager.getMessage("admin-set-success", "player", target.getName(), "twist", twist.displayName())));
     }

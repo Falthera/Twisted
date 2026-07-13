@@ -62,7 +62,7 @@ public class PlayerListener implements Listener {
             }, 40L);
         }
 
-        startPassiveEffects(player, data);
+        refreshPassiveEffects(player, data);
         plugin.getDataManager().savePlayerData(data, true);
     }
 
@@ -174,6 +174,22 @@ public class PlayerListener implements Listener {
         }
     }
 
+    public void refreshPassiveEffects(Player player, PlayerData data) {
+        stopPassiveEffects(player);
+        if (data.isTwistSelected()) {
+            startPassiveEffects(player, data);
+        }
+    }
+
+    private void stopPassiveEffects(Player player) {
+        org.bukkit.attribute.AttributeInstance maxHealth = player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH);
+        if (maxHealth != null) {
+            maxHealth.setBaseValue(20.0);
+        }
+        player.removePotionEffect(org.bukkit.potion.PotionEffectType.NIGHT_VISION);
+        player.removePotionEffect(org.bukkit.potion.PotionEffectType.FIRE_RESISTANCE);
+    }
+
     private void startPassiveEffects(Player player, PlayerData data) {
         if (!data.isTwistSelected()) return;
         Twist twist = data.getTwist();
@@ -188,9 +204,11 @@ public class PlayerListener implements Listener {
                     org.bukkit.potion.PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 0, false, false));
             }
             case TITAN -> {
-                player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).setBaseValue(20 + (data.getEvolutionStage() * 4));
+                org.bukkit.attribute.AttributeInstance maxHealth = player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH);
+                if (maxHealth != null) {
+                    maxHealth.setBaseValue(20 + (data.getEvolutionStage() * 4));
+                }
             }
             default -> {}
         }
     }
-}

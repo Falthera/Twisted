@@ -44,6 +44,7 @@ public final class TwistedSMP extends JavaPlugin {
     private InstabilityManager instabilityManager;
     private BukkitAudiences adventure;
     private com.twisted.smp.vfx.VFXManager vfxManager;
+    private com.twisted.smp.listeners.PlayerListener playerListener;
 
     private final Map<UUID, PlayerData> playerDataCache = new ConcurrentHashMap<>();
 
@@ -133,7 +134,8 @@ public final class TwistedSMP extends JavaPlugin {
     }
 
     private void registerListeners() {
-        getServer().getPluginManager().registerEvents(new com.twisted.smp.listeners.PlayerListener(this, dataManager, twistManager), this);
+        playerListener = new com.twisted.smp.listeners.PlayerListener(this, dataManager, twistManager);
+        getServer().getPluginManager().registerEvents(playerListener, this);
         getServer().getPluginManager().registerEvents(new com.twisted.smp.listeners.CombatListener(this, dataManager, twistManager, antiAbuseManager, configManager), this);
         getServer().getPluginManager().registerEvents(new com.twisted.smp.listeners.EntityListener(this, dataManager, twistManager, abilityManager), this);
         getServer().getPluginManager().registerEvents(new com.twisted.smp.listeners.WorldListener(this, configManager, twistManager, abilityManager), this);
@@ -190,6 +192,10 @@ public final class TwistedSMP extends JavaPlugin {
 
     public RiftEvent getRiftEvent() {
         return riftEvent;
+    }
+
+    public com.twisted.smp.listeners.PlayerListener getPlayerListener() {
+        return playerListener;
     }
 
     public AntiAbuseManager getAntiAbuseManager() {
