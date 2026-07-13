@@ -34,7 +34,7 @@ public class ParticlePatterns {
             Location l = center.clone().add(x, 0.15, z);
             DustOptions dust = new DustOptions(color.toBukkit(), size);
             center.getWorld().spawnParticle(Particle.DUST, l, 2, 0.03, 0.03, 0.03, 0, dust);
-            center.getWorld().spawnParticle(Particle.ENTITY_EFFECT, l, 1, 0.01, 0.01, 0.01, 0);
+            center.getWorld().spawnParticle(Particle.SPELL_MOB_AMBIENT, l, 1, 0.01, 0.01, 0.01, 0);
         }
     }
 
@@ -49,7 +49,7 @@ public class ParticlePatterns {
             Location l = center.clone().add(x, y, z);
             DustOptions dust = new DustOptions(color.toBukkit(), 1.2f);
             center.getWorld().spawnParticle(Particle.DUST, l, 1, 0.02, 0.02, 0.02, 0, dust);
-            center.getWorld().spawnParticle(Particle.ENTITY_EFFECT, l, 1, 0.01, 0.01, 0.01, 0);
+            center.getWorld().spawnParticle(Particle.SPELL_MOB_AMBIENT, l, 1, 0.01, 0.01, 0.01, 0);
         }
     }
 
@@ -82,7 +82,7 @@ public class ParticlePatterns {
     public static void trail(Location location, Color color) {
         DustOptions dust = new DustOptions(color.toBukkit(), 1.0f);
         location.getWorld().spawnParticle(Particle.DUST, location, 2, 0.1, 0.1, 0.1, 0.01, dust);
-        location.getWorld().spawnParticle(Particle.ENTITY_EFFECT, location, 1, 0.05, 0.05, 0.05, 0);
+        location.getWorld().spawnParticle(Particle.SPELL_MOB_AMBIENT, location, 1, 0.05, 0.05, 0.05, 0);
     }
 
     public static void verticalPillar(Location base, double height, Color color, int durationTicks, org.bukkit.plugin.java.JavaPlugin plugin) {
