@@ -265,6 +265,11 @@ public class PlayerListener implements Listener {
         }
         if (abilityMat != null && item.getType() == abilityMat) {
             event.setCancelled(true);
+            if (item.getAmount() > 1) {
+                item.setAmount(item.getAmount() - 1);
+            } else {
+                player.getInventory().remove(item);
+            }
             plugin.getAbilityManager().useAbility(player, data.getTwist());
             return;
         }
