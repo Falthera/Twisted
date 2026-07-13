@@ -31,6 +31,7 @@ import org.bukkit.Color;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -48,7 +49,7 @@ public class RiftEvent implements Listener {
     private org.bukkit.scheduler.BukkitTask localBroadcastTask;
     private int duration;
     private final Map<Location, Material> placedBlocks = new ConcurrentHashMap<>();
-    private final java.util.Set<UUID> openedChest = ConcurrentHashMap.newKeySet();
+    private final Set<String> openedChest = ConcurrentHashMap.newKeySet();
     private java.util.List<String> allowedWorlds;
 
     public RiftEvent(TwistedSMP plugin, ConfigManager configManager, com.twisted.smp.core.DataManager dataManager) {
@@ -260,7 +261,7 @@ public class RiftEvent implements Listener {
     }
 
     public void openRiftChest(Player player) {
-        if (openedChest.contains(player.getUniqueId())) {
+        if (openedChest.contains(player.getUniqueId().toString())) {
             player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()
                 .deserialize(plugin.getConfigManager().getMessage("withdraw-fail", "amount", "this")));
             return;
@@ -289,7 +290,7 @@ public class RiftEvent implements Listener {
                 } catch (IllegalArgumentException e) { /* ignore invalid materials */ }
             }
 
-            openedChest.add(player.getUniqueId());
+            openedChest.add(player.getUniqueId().toString());
         }
 
         if (!openedChest.contains(player.getUniqueId() + "_essence")) {
