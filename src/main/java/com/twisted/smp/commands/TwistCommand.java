@@ -87,9 +87,10 @@ public class TwistCommand implements CommandExecutor, TabCompleter {
         String stageName = energyManager.getStageName(data.getEnergy());
         String energyColor = energyManager.getStageColor(data.getEnergy());
 
+        Component twistNameComponent = MiniMessage.miniMessage().deserialize(twistName);
         Component header = Component.text("Twist Stats".toUpperCase(), NamedTextColor.GOLD);
         Component body = Component.empty()
-            .append(statsLine("Twist", twistName, NamedTextColor.WHITE))
+            .append(Component.text("Twist: ", NamedTextColor.GRAY).append(twistNameComponent))
             .append(Component.newline())
             .append(statsLine("Stage", stageName, NamedTextColor.YELLOW))
             .append(Component.newline())

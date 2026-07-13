@@ -106,7 +106,7 @@ public class TwistManager {
         org.bukkit.inventory.ItemStack item = new org.bukkit.inventory.ItemStack(mat);
         org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(net.kyori.adventure.text.Component.text(getTwistDisplayName(twist)));
+            meta.displayName(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(getTwistDisplayName(twist)));
             meta.lore(getSelectionLore(twist).stream()
                 .map(s -> net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(
                     s.replace("<gray>", "§7").replace("<white>", "§f").replace("<green>", "§a").replace("<red>", "§c")))
