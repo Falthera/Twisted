@@ -45,9 +45,11 @@ energy-stage-ascended: "<gold>Ascended"
 essence-gain: "{prefix} <dark_purple>+%amount% Essence <gray>(Total: %new%)"
 essence-loss: "{prefix} <dark_red>-%amount% Essence <gray>(Total: %new%)"
 essence-insufficient: "{prefix} <red>Not enough Essence! Required: %amount%, Have: %have%"
-withdraw-success: "{prefix} <dark_purple>Withdrew %amount% Essence into items."
+withdraw-success: "{prefix} <dark_purple>Withdrew %amount% Essence into Twisted Essence items."
 withdraw-fail: "{prefix} <red>Could not withdraw %amount% Essence. Ensure you have room in your inventory."
-withdraw-deposit: "{prefix} <dark_purple>Deposited %amount% Essence back from Twisted Essence item."
+withdraw-deposit: "{prefix} <dark_purple>Deposited %amount% Essence from Twisted Essence item."
+essence-deposit-success: "{prefix} <dark_purple>Deposited %amount% Essence back into your balance."
+essence-deposit-fail: "{prefix} <red>This item cannot be deposited."
 
 # =====================================================
 # Instability Messages

@@ -26,13 +26,20 @@ public class PlayerData implements Cloneable {
     private final Map<String, Long> abilityCooldowns;
     private boolean twistSelected;
     private final long firstJoin;
+    private double maxEnergy;
 
     public PlayerData(UUID uuid, com.twisted.smp.twists.Twist twist, double energy, double essence,
                       double instability, int evolutionStage, int kills, int deaths,
                       Map<String, Long> abilityCooldowns, boolean twistSelected, long firstJoin) {
+        this(uuid, twist, energy, essence, instability, evolutionStage, kills, deaths, abilityCooldowns, twistSelected, firstJoin, 200.0);
+    }
+
+    public PlayerData(UUID uuid, com.twisted.smp.twists.Twist twist, double energy, double essence,
+                      double instability, int evolutionStage, int kills, int deaths,
+                      Map<String, Long> abilityCooldowns, boolean twistSelected, long firstJoin, double maxEnergy) {
         this.uuid = Objects.requireNonNull(uuid);
         this.twist = twist;
-        this.energy = clampEnergy(energy);
+        this.energy = clampEnergy(energy, maxEnergy);
         this.essence = Math.max(0, essence);
         this.instability = clampInstability(instability);
         this.evolutionStage = evolutionStage;
@@ -43,8 +50,8 @@ public class PlayerData implements Cloneable {
         this.firstJoin = firstJoin;
     }
 
-    private static double clampEnergy(double energy) {
-        return Math.max(0, Math.min(200, energy));
+    private static double clampEnergy(double energy, double maxEnergy) {
+        return Math.max(0, Math.min(maxEnergy, energy));
     }
 
     private static double clampInstability(double instability) {
@@ -62,21 +69,22 @@ public class PlayerData implements Cloneable {
     public Map<String, Long> getAbilityCooldowns() { return Collections.unmodifiableMap(abilityCooldowns); }
     public boolean isTwistSelected() { return twistSelected; }
     public long getFirstJoin() { return firstJoin; }
+    public double getMaxEnergy() { return maxEnergy; }
 
     public void setTwist(com.twisted.smp.twists.Twist twist) {
         this.twist = twist;
     }
 
     public void setEnergy(double energy) {
-        this.energy = clampEnergy(energy);
+        this.energy = clampEnergy(energy, maxEnergy);
     }
 
     public void addEnergy(double amount) {
-        this.energy = clampEnergy(this.energy + amount);
+        this.energy = clampEnergy(this.energy + amount, maxEnergy);
     }
 
     public void subtractEnergy(double amount) {
-        this.energy = clampEnergy(this.energy - Math.abs(amount));
+        this.energy = clampEnergy(this.energy - Math.abs(amount), maxEnergy);
     }
 
     public void setEssence(double essence) {
@@ -153,9 +161,15 @@ public class PlayerData implements Cloneable {
         return String.format("%.0f%%", energy);
     }
 
+    public void setMaxEnergy(double maxEnergy) {
+        this.maxEnergy = maxEnergy;
+        this.energy = clampEnergy(energy, maxEnergy);
+    }
+
     public PlayerData snapshot() {
         Map<String, Long> cd = new ConcurrentHashMap<>(abilityCooldowns);
-        return new PlayerData(uuid, twist, energy, essence, instability, evolutionStage, kills, deaths, cd, twistSelected, firstJoin);
+        PlayerData copy = new PlayerData(uuid, twist, energy, essence, instability, evolutionStage, kills, deaths, cd, twistSelected, firstJoin, maxEnergy);
+        return copy;
     }
 
     public void writeToPersistentData(PersistentDataContainer container) {

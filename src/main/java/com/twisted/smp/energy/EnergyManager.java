@@ -52,15 +52,8 @@ public class EnergyManager {
             // Same twist kills are still tracked by anti-abuse manager but still award energy
         }
 
-        boolean granted = addEnergy(killer, reward);
+        addEnergy(killer, reward);
         subtractEnergy(victim, Math.abs(victimPenalty));
-
-        if (granted) {
-            notifyEnergyChange(killer.getUuid(), "+" + reward, "energy-gain");
-        }
-        if (victimPenalty != 0) {
-            notifyEnergyChange(victim.getUuid(), String.valueOf(victimPenalty), "energy-loss");
-        }
 
         plugin.getDataManager().savePlayerData(killer, true);
         plugin.getDataManager().savePlayerData(victim, true);
@@ -68,19 +61,13 @@ public class EnergyManager {
 
     public void awardDragonDeath(PlayerData player) {
         double reward = getDragonKillReward();
-        boolean granted = addEnergy(player, reward);
-        if (granted) {
-            notifyEnergyChange(player.getUuid(), "+" + reward, "energy-gain");
-        }
+        addEnergy(player, reward);
         plugin.getDataManager().savePlayerData(player, true);
     }
 
     public void awardWitherDeath(PlayerData player) {
         double reward = getWitherKillReward();
-        boolean granted = addEnergy(player, reward);
-        if (granted) {
-            notifyEnergyChange(player.getUuid(), "+" + reward, "energy-gain");
-        }
+        addEnergy(player, reward);
         plugin.getDataManager().savePlayerData(player, true);
     }
 
@@ -94,10 +81,8 @@ public class EnergyManager {
         if (newEnergy > max) {
             double overflow = newEnergy - max;
             data.setEnergy(max);
-            data.addEssence(overflow);
-            if (newEnergy >= max) {
-                notifyEnergyChange(data.getUuid(), configManager.getMessage("energy-max-reached"), "");
-            }
+            double ratio = configManager.getConfig().getDouble("essence.overflow-ratio", 1.0);
+            data.addEssence(overflow * ratio);
         } else {
             data.setEnergy(newEnergy);
         }
@@ -153,10 +138,10 @@ public class EnergyManager {
         };
     }
 
-    private void notifyEnergyChange(UUID uuid, String message, String messagePath) {
+    private void notifyEnergyChange(UUID uuid, String message, String messagePath, int newTotal) {
         org.bukkit.entity.Player player = org.bukkit.Bukkit.getPlayer(uuid);
         if (player != null && player.isOnline()) {
-            String msg = messagePath.isEmpty() ? message : configManager.getMessage(messagePath, "amount", message, "new", "???");
+            String msg = messagePath.isEmpty() ? message : configManager.getMessage(messagePath, "amount", message, "new", String.valueOf(newTotal));
             player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(msg));
         }
     }

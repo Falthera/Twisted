@@ -18,14 +18,13 @@ public class DatabaseManager {
     private java.sql.Connection connection;
     private final ConcurrentHashMap<UUID, Long> lastUpdate = new ConcurrentHashMap<>();
 
-    public DatabaseManager(TwistedSMP plugin, ConfigManager configManager) {
+    public DatabaseManager(TwistedSMP plugin) {
         this.plugin = plugin;
     }
 
     public synchronized boolean initialize() {
         try {
             String dbPath = new File(plugin.getDataFolder(), "twisted-data.db").getAbsolutePath();
-            Class.forName("org.sqlite.JDBC");
             String url = "jdbc:sqlite:" + dbPath;
             connection = java.sql.DriverManager.getConnection(url);
             connection.setAutoCommit(true);
@@ -108,6 +107,50 @@ public class DatabaseManager {
             } catch (Exception e) {
                 plugin.getLogger().warning("Error closing database: " + e.getMessage());
             }
+        }
+    }
+
+    public void saveAntiAbuseData(UUID uuid, UUID lastKillUuid, long lastKillTime, int samePlayerKills, String lastIp, double playtimeMinutes, double combatTagEnd) {
+        try {
+            Connection conn = getConnection();
+            try (PreparedStatement ps = conn.prepareStatement("""
+                INSERT OR REPLACE INTO anti_abuse_data (uuid, last_kill_uuid, last_kill_time, same_player_kills, last_ip, playtime_minutes, combat_tag_end)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """)) {
+                ps.setString(1, uuid.toString());
+                ps.setString(2, lastKillUuid != null ? lastKillUuid.toString() : null);
+                ps.setDouble(3, lastKillTime);
+                ps.setInt(4, samePlayerKills);
+                ps.setString(5, lastIp);
+                ps.setDouble(6, playtimeMinutes);
+                ps.setDouble(7, combatTagEnd);
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed to save anti-abuse data: " + e.getMessage());
+        }
+    }
+
+    public void loadAntiAbuseData(UUID uuid, java.util.function.Consumer<java.util.Map<String, Object>> consumer) {
+        try {
+            Connection conn = getConnection();
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM anti_abuse_data WHERE uuid = ?")) {
+                ps.setString(1, uuid.toString());
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        java.util.Map<String, Object> data = new java.util.HashMap<>();
+                        data.put("lastKillUuid", rs.getString("last_kill_uuid"));
+                        data.put("lastKillTime", rs.getDouble("last_kill_time"));
+                        data.put("samePlayerKills", rs.getInt("same_player_kills"));
+                        data.put("lastIp", rs.getString("last_ip"));
+                        data.put("playtimeMinutes", rs.getDouble("playtime_minutes"));
+                        data.put("combatTagEnd", rs.getDouble("combat_tag_end"));
+                        consumer.accept(data);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // ignore
         }
     }
 }

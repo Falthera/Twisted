@@ -19,7 +19,7 @@ public class EvolutionManager {
     private final TwistedSMP plugin;
     private final ConfigManager configManager;
 
-    public EvolutionManager(TwistedSMP plugin, ConfigManager configManager, com.twisted.smp.core.DataManager dataManager, com.twisted.smp.twists.TwistManager twistManager) {
+    public EvolutionManager(TwistedSMP plugin, ConfigManager configManager) {
         this.plugin = plugin;
         this.configManager = configManager;
     }

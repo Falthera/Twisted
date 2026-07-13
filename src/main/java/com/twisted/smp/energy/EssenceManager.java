@@ -34,7 +34,7 @@ public class EssenceManager {
 
     public void awardEssence(PlayerData data, double amount) {
         data.addEssence(amount);
-        notifyEssenceChange(data.getUuid(), "+" + amount, "essence-gain");
+        notifyEssenceChange(data.getUuid(), "+" + amount, "essence-gain", (int) data.getEssence());
     }
 
     public boolean canAffordTwistChange(double amount) {
@@ -45,10 +45,10 @@ public class EssenceManager {
         return amount > 0;
     }
 
-    private void notifyEssenceChange(UUID uuid, String message, String messagePath) {
+    private void notifyEssenceChange(UUID uuid, String message, String messagePath, int newTotal) {
         org.bukkit.entity.Player player = org.bukkit.Bukkit.getPlayer(uuid);
         if (player != null && player.isOnline()) {
-            String msg = configManager.getMessage(messagePath, "amount", message, "new", "???");
+            String msg = configManager.getMessage(messagePath, "amount", message, "new", String.valueOf(newTotal));
             player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(msg));
         }
     }

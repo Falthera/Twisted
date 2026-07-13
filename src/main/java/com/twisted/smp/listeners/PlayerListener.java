@@ -2,6 +2,7 @@ package com.twisted.smp.listeners;
 
 import com.twisted.smp.TwistedSMP;
 import com.twisted.smp.core.ConfigManager;
+import com.twisted.smp.core.DataManager;
 import com.twisted.smp.core.PlayerData;
 import com.twisted.smp.energy.EssenceManager;
 import com.twisted.smp.twists.Twist;
@@ -71,11 +72,18 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
         PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
         if (data != null) {
+            UUID uuid = player.getUniqueId();
+            if (plugin.getAntiAbuseManager().isCombatTagged(uuid)) {
+                plugin.getAntiAbuseManager().applyCombatLogPenalty(data);
+                player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(
+                    plugin.getConfigManager().getMessage("death-penalty", "energy", String.valueOf(Math.abs((int) plugin.getAntiAbuseManager().getDeathPenalty(uuid))))));
+            }
             data.purgeExpiredCooldowns();
             dataManager.savePlayerData(data, false);
-            dataManager.getPlayerDataCache().remove(player.getUniqueId());
+            plugin.getAntiAbuseManager().saveData(uuid);
+            dataManager.getPlayerDataCache().remove(uuid);
             if (plugin.vfx() != null) {
-                plugin.vfx().untrack(player.getUniqueId());
+                plugin.vfx().untrack(uuid);
             }
         }
     }
@@ -140,9 +148,12 @@ public class PlayerListener implements Listener {
         if (data == null || !data.isTwistSelected()) return;
 
         if (data.getTwist() == Twist.BERSERKER) {
-            int hungerRate = (int) (1 / 1.8);
-            if (event.getFoodLevel() > player.getFoodLevel()) {
-                player.setFoodLevel(Math.max(0, player.getFoodLevel() - hungerRate));
+            org.bukkit.configuration.ConfigurationSection berserkerConfig = plugin.getConfigManager().getTwistConfig("berserker");
+            double hungerMult = berserkerConfig != null ? berserkerConfig.getDouble("passive.hunger-drain-multiplier", 1.0) : 1.0;
+            if (hungerMult > 1.0 && event.getFoodLevel() > player.getFoodLevel()) {
+                int delta = event.getFoodLevel() - player.getFoodLevel();
+                int adjusted = (int) Math.floor(delta / hungerMult);
+                event.setFoodLevel(player.getFoodLevel() + Math.max(0, adjusted));
             }
         }
     }
@@ -171,6 +182,75 @@ public class PlayerListener implements Listener {
             ParticlePatterns.ringBurst(to.clone().add(0, 0.2, 0), 2.5, 30, ParticlePatterns.Color.VOID, 2.0f);
             to.getWorld().spawnParticle(Particle.PORTAL, to, 35, 0.6, 0.6, 0.6, 0.08);
             to.getWorld().spawnParticle(Particle.DRAGON_BREATH, to, 10, 1.0, 0.5, 1.0, 0.02);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+        Player player = event.getPlayer();
+        PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
+        if (data == null || !data.isTwistSelected()) return;
+
+        ItemStack item = event.getItem();
+        if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) return;
+
+        String displayName = item.getItemMeta().getDisplayName();
+        if (displayName.contains("Twisted Essence")) {
+            if (data.getEssence() > 0) {
+                data.addEssence(1);
+                if (item.getAmount() > 1) {
+                    item.setAmount(item.getAmount() - 1);
+                } else {
+                    player.getInventory().remove(item);
+                }
+                player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(
+                    plugin.getConfigManager().getMessage("essence-deposit-success", "amount", "1")));
+                plugin.getDataManager().savePlayerData(data, true);
+            }
+            event.setCancelled(true);
+            return;
+        }
+
+        if (displayName.contains("Stability Crystal")) {
+            if (data.getInstability() > 0) {
+                double reduction = Math.min(50, data.getInstability());
+                data.subtractInstability(reduction);
+                if (item.getAmount() > 1) {
+                    item.setAmount(item.getAmount() - 1);
+                } else {
+                    player.getInventory().remove(item);
+                }
+                player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(
+                    "<green>Instability reduced by " + (int) reduction + "%"));
+                plugin.getDataManager().savePlayerData(data, true);
+            } else {
+                player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(
+                    "<red>You have no instability to reduce."));
+            }
+            event.setCancelled(true);
+            return;
+        }
+
+        if (displayName.contains("Rift Key")) {
+            if (plugin.getRiftEvent() != null && !plugin.getRiftEvent().isActive()) {
+                plugin.getRiftEvent().start();
+                if (item.getAmount() > 1) {
+                    item.setAmount(item.getAmount() - 1);
+                } else {
+                    player.getInventory().remove(item);
+                }
+                player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(
+                    "<dark_aqua>You have summoned a Rift Event!"));
+                plugin.getDataManager().savePlayerData(data, true);
+            } else {
+                player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(
+                    "<red>A Rift Event is already active."));
+            }
+            event.setCancelled(true);
+            return;
         }
     }
 

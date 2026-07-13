@@ -45,8 +45,11 @@ public class RiftEvent implements Listener {
     private Location portalCenter;
     private org.bukkit.scheduler.BukkitTask particleTask;
     private org.bukkit.scheduler.BukkitTask expireTask;
+    private org.bukkit.scheduler.BukkitTask localBroadcastTask;
     private int duration;
     private final Map<Location, Material> placedBlocks = new ConcurrentHashMap<>();
+    private final java.util.Set<UUID> openedChest = ConcurrentHashMap.newKeySet();
+    private java.util.List<String> allowedWorlds;
 
     public RiftEvent(TwistedSMP plugin, ConfigManager configManager, com.twisted.smp.core.DataManager dataManager) {
         this.plugin = plugin;
@@ -59,8 +62,23 @@ public class RiftEvent implements Listener {
         if (active) return false;
         active = true;
         duration = configManager.getEventConfig("rift").getInt("duration", 600);
+        allowedWorlds = configManager.getEventConfig("rift").getStringList("allowed-worlds");
+        openedChest.clear();
 
-        org.bukkit.World world = Bukkit.getWorlds().get(0);
+        org.bukkit.World world = null;
+        if (allowedWorlds != null && !allowedWorlds.isEmpty()) {
+            for (String worldName : allowedWorlds) {
+                org.bukkit.World w = Bukkit.getWorld(worldName);
+                if (w != null) {
+                    world = w;
+                    break;
+                }
+            }
+        }
+        if (world == null) {
+            world = Bukkit.getWorlds().get(0);
+        }
+
         int minDist = configManager.getEventConfig("rift").getInt("min-distance-from-spawn", 500);
         int maxDist = configManager.getEventConfig("rift").getInt("max-distance-from-spawn", 2000);
         Location spawn = world.getSpawnLocation();
@@ -88,15 +106,16 @@ public class RiftEvent implements Listener {
         plugin.vfx().holograms().spawnRiftHologram(riftLoc.clone().add(0, 2, 0), duration);
         ParticlePatterns.verticalPillar(riftLoc.clone().add(0, 0.5, 0), 10, ParticlePatterns.Color.RIFT, duration, plugin);
 
-        new org.bukkit.scheduler.BukkitRunnable() {
+        localBroadcastTask = new org.bukkit.scheduler.BukkitRunnable() {
             public void run() {
                 if (!active) {
                     cancel();
                     return;
                 }
+                double localRadius = configManager.getEventConfig("rift").getDouble("broadcast.local-radius", 200);
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     double d = p.getLocation().distance(riftLoc);
-                    if (d < 30) {
+                    if (d < localRadius) {
                         p.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()
                             .deserialize(configManager.getMessage("event-rift-start-local")));
                         break;
@@ -154,6 +173,8 @@ public class RiftEvent implements Listener {
         removeRiftPortal();
         if (particleTask != null) particleTask.cancel();
         if (expireTask != null) expireTask.cancel();
+        if (localBroadcastTask != null) localBroadcastTask.cancel();
+        openedChest.clear();
         plugin.vfx().holograms().clearAll();
         return true;
     }
@@ -187,16 +208,17 @@ public class RiftEvent implements Listener {
                     Block block = loc.getBlock();
 
                     if (isTop || isBottom || (isEdge && y > 0 && y < 6)) {
+                        placedBlocks.put(loc.clone(), block.getType());
                         block.setType(frameMat, false);
-                        placedBlocks.put(loc.clone(), frameMat);
                     } else if (Math.abs(x) <= 1 && Math.abs(z) <= 1 && y >= 1 && y <= 5) {
-                        block.setType(Material.AIR);
+                        placedBlocks.put(loc.clone(), block.getType());
+                        block.setType(Material.AIR, false);
                     } else if (!isEdge && y == 0) {
+                        placedBlocks.put(loc.clone(), block.getType());
                         block.setType(netherrackMat, false);
-                        placedBlocks.put(loc.clone(), netherrackMat);
                         if (Math.abs(x) == 1 && Math.abs(z) == 1 && y == 1) {
                             block.getRelative(org.bukkit.block.BlockFace.UP).setType(fireMat, false);
-                            placedBlocks.put(loc.clone().add(0, 1, 0), fireMat);
+                            placedBlocks.put(loc.clone().add(0, 1, 0), Material.AIR);
                         }
                     }
                 }
@@ -207,21 +229,22 @@ public class RiftEvent implements Listener {
             for (int z = -3; z <= 3; z++) {
                 Location loc = base.clone().add(x, 0, z);
                 if (loc.getBlock().getType() == Material.AIR) {
+                    placedBlocks.put(loc.clone(), Material.AIR);
                     loc.getBlock().setType(Material.PODZOL, false);
-                    placedBlocks.put(loc.clone(), Material.PODZOL);
                 }
             }
         }
 
         Location topCenter = base.clone().add(0, 7, 0);
+        placedBlocks.put(topCenter, topCenter.getBlock().getType());
         topCenter.getBlock().setType(lanternMat, false);
-        placedBlocks.put(topCenter, lanternMat);
     }
 
     private void removeRiftPortal() {
         for (Map.Entry<Location, Material> entry : placedBlocks.entrySet()) {
-            if (entry.getKey().getBlock().getType() != Material.AIR) {
-                entry.getKey().getBlock().setType(Material.AIR, false);
+            org.bukkit.block.Block block = entry.getKey().getBlock();
+            if (block != null) {
+                block.setType(entry.getValue(), false);
             }
         }
         placedBlocks.clear();
@@ -237,9 +260,16 @@ public class RiftEvent implements Listener {
     }
 
     public void openRiftChest(Player player) {
+        if (openedChest.contains(player.getUniqueId())) {
+            player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()
+                .deserialize(plugin.getConfigManager().getMessage("withdraw-fail", "amount", "this")));
+            return;
+        }
+
         Location loc = riftLocation.clone().add(0, 1, 0);
         Block block = loc.getBlock();
-        if (block.getType() != Material.CHEST) {
+        boolean firstOpen = block.getType() != Material.CHEST;
+        if (firstOpen) {
             block.setType(Material.CHEST, false);
             Chest chest = (Chest) block.getState();
             Inventory inv = chest.getInventory();
@@ -259,25 +289,39 @@ public class RiftEvent implements Listener {
                 } catch (IllegalArgumentException e) { /* ignore invalid materials */ }
             }
 
-            List<Map<?, ?>> essenceList = configManager.getEventConfig("rift").getMapList("rewards.essence");
-            if (!essenceList.isEmpty()) {
-                Map<?, ?> map = essenceList.get(random.nextInt(essenceList.size()));
-                double min = ((Number) map.get("min")).doubleValue();
-                double max = ((Number) map.get("max")).doubleValue();
-                double amount = min + random.nextDouble() * (max - min);
-                PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
-                if (data != null) {
+            openedChest.add(player.getUniqueId());
+        }
+
+        if (!openedChest.contains(player.getUniqueId() + "_essence")) {
+            PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
+            if (data != null) {
+                List<Map<?, ?>> essenceList = configManager.getEventConfig("rift").getMapList("rewards.essence");
+                if (!essenceList.isEmpty()) {
+                    Map<?, ?> map = essenceList.get(new Random().nextInt(essenceList.size()));
+                    double min = ((Number) map.get("min")).doubleValue();
+                    double max = ((Number) map.get("max")).doubleValue();
+                    double amount = min + Math.random() * (max - min);
                     data.addEssence(amount);
                     dataManager.savePlayerData(data, true);
                 }
             }
-
-            chest.update();
+            openedChest.add(player.getUniqueId() + "_essence");
         }
+
+        if (firstOpen) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (block.getType() == Material.CHEST) {
+                    block.setType(Material.AIR, false);
+                }
+            }, 200L);
+        }
+
+        Chest chest = (Chest) block.getState();
+        chest.update();
 
         ParticlePatterns.explosion(loc.clone().add(0.5, 0.5, 0.5), ParticlePatterns.Color.RIFT, 2.0f);
         plugin.vfx().shake().shake(player, ScreenShake.Intensity.LIGHT);
-        plugin.vfx().sounds().playRiftChestOpen(loc);
+        plugin.vfx().sounds().playRiftChestOpen(block.getLocation());
         plugin.vfx().holograms().spawnTextHologram(loc.clone().add(0, 2.2, 0), "§d§lREWARD!", 35, ParticlePatterns.Color.RIFT.toAdventure());
     }
 }

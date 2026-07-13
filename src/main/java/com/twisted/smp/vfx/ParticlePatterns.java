@@ -3,14 +3,11 @@ package com.twisted.smp.vfx;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
-import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ParticlePatterns {
-
-    private static final ThreadLocalRandom RNG = ThreadLocalRandom.current();
 
     public static void spiral(Location center, double radius, double height, int particles, Color color, double speed) {
         for (int i = 0; i < particles; i++) {
@@ -97,9 +94,9 @@ public class ParticlePatterns {
                 }
                 for (double y = 0.5; y < height; y += 0.35) {
                     Location l = base.clone().add(
-                        RNG.nextGaussian() * 0.15,
+                        ThreadLocalRandom.current().nextGaussian() * 0.15,
                         y,
-                        RNG.nextGaussian() * 0.15
+                        ThreadLocalRandom.current().nextGaussian() * 0.15
                     );
                     DustOptions dust = new DustOptions(color.toBukkit(), 1.3f);
                     base.getWorld().spawnParticle(Particle.DUST, l, 2, 0.03, 0.03, 0.03, 0, dust);

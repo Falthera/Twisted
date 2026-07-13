@@ -34,15 +34,13 @@ public class EntityListener implements Listener {
     @EventHandler
     public void onEnderTeleport(EntityTeleportEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
+        if (event.getCause() != EntityTeleportEvent.TeleportCause.ENDER_PEARL) return;
         PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
         if (data == null || !data.isTwistSelected()) return;
 
         if (data.getTwist() == com.twisted.smp.twists.Twist.VOID) {
             double damageMult = configManager.getTwistConfig("voidwalker").getDouble("passive.pearl-damage-multiplier", 1.5);
             double damage = 1.0 * damageMult;
-            org.bukkit.event.entity.EntityDamageEvent eventDamage = new org.bukkit.event.entity.EntityDamageEvent(
-                player, org.bukkit.event.entity.EntityDamageEvent.DamageCause.FALL, (float) damage);
-            player.setLastDamageCause(eventDamage);
             player.damage(damage);
         }
     }

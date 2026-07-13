@@ -176,17 +176,34 @@ public class TwistCommand implements CommandExecutor, TabCompleter {
         data.subtractEssence(amount);
         plugin.getDataManager().savePlayerData(data, true);
 
-        int stackSize = (int) Math.min(amount, 64);
-        org.bukkit.inventory.ItemStack item = new org.bukkit.inventory.ItemStack(org.bukkit.Material.DIAMOND, stackSize);
-        org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.displayName(net.kyori.adventure.text.Component.text("Twisted Essence", net.kyori.adventure.text.format.TextColor.color(0xa29bfe)));
-            java.util.List<net.kyori.adventure.text.Component> lore = new java.util.ArrayList<>();
-            lore.add(net.kyori.adventure.text.Component.text("Worth: " + (int) amount + " Essence", net.kyori.adventure.text.format.TextColor.color(0xbb86fc)));
-            meta.lore(lore);
-            item.setItemMeta(meta);
+        int totalItems = (int) Math.floor(amount);
+        int stacks = totalItems / 64;
+        int remainder = totalItems % 64;
+
+        for (int i = 0; i < stacks; i++) {
+            org.bukkit.inventory.ItemStack stack = new org.bukkit.inventory.ItemStack(org.bukkit.Material.DIAMOND, 64);
+            org.bukkit.inventory.meta.ItemMeta meta = stack.getItemMeta();
+            if (meta != null) {
+                meta.displayName(net.kyori.adventure.text.Component.text("Twisted Essence", net.kyori.adventure.text.format.TextColor.color(0xa29bfe)));
+                java.util.List<net.kyori.adventure.text.Component> lore = new java.util.ArrayList<>();
+                lore.add(net.kyori.adventure.text.Component.text("Worth: 64 Essence", net.kyori.adventure.text.format.TextColor.color(0xbb86fc)));
+                meta.lore(lore);
+                stack.setItemMeta(meta);
+            }
+            player.getInventory().addItem(stack);
         }
-        player.getInventory().addItem(item);
+        if (remainder > 0) {
+            org.bukkit.inventory.ItemStack remStack = new org.bukkit.inventory.ItemStack(org.bukkit.Material.DIAMOND, remainder);
+            org.bukkit.inventory.meta.ItemMeta meta = remStack.getItemMeta();
+            if (meta != null) {
+                meta.displayName(net.kyori.adventure.text.Component.text("Twisted Essence", net.kyori.adventure.text.format.TextColor.color(0xa29bfe)));
+                java.util.List<net.kyori.adventure.text.Component> lore = new java.util.ArrayList<>();
+                lore.add(net.kyori.adventure.text.Component.text("Worth: " + remainder + " Essence", net.kyori.adventure.text.format.TextColor.color(0xbb86fc)));
+                meta.lore(lore);
+                remStack.setItemMeta(meta);
+            }
+            player.getInventory().addItem(remStack);
+        }
         player.sendMessage(MiniMessage.miniMessage().deserialize(
             plugin.getConfigManager().getMessage("withdraw-success", "amount", String.valueOf((int) amount))));
     }

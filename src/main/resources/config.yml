@@ -31,8 +31,8 @@ energy:
   dragon-kill-reward: 50
   # Energy gained for Wither kill
   wither-kill-reward: 40
-  # Energy decay per minute when above 150% (to simulate instability)
-  high-energy-decay: 0
+  # Energy decay per tick when above 150 energy (to simulate power drain)
+  high-energy-decay: 2
 
 # =====================================================
 # Essence System
@@ -54,7 +54,7 @@ instability:
   # Minimum energy threshold before instability starts growing
   energy-threshold: 150
   # Instability gain per minute when above energy threshold (0 = disabled)
-  passive-instability-gain: 0
+  passive-instability-gain: 0.5
   # Instability gained on ability overflow (0 = disabled)
   ability-overflow-instability: 5
 

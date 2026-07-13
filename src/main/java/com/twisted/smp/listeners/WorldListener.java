@@ -43,11 +43,12 @@ public class WorldListener implements Listener {
     @EventHandler
     public void onDragonKill(EntityDeathEvent event) {
         if (!(event.getEntity() instanceof EnderDragon dragon)) return;
+        Location loc = dragon.getLocation().clone().add(0, 2, 0);
         for (Player p : event.getEntity().getWorld().getPlayers()) {
+            if (p.getLocation().distance(loc) > 50) continue;
             PlayerData data = plugin.getDataManager().getOrCreatePlayerData(p.getUniqueId());
             if (data.isTwistSelected()) {
                 plugin.getEnergyManager().awardDragonDeath(data);
-                Location loc = dragon.getLocation().clone().add(0, 2, 0);
                 ParticlePatterns.explosion(loc, ParticlePatterns.Color.EVOLUTION, 3.5f);
                 plugin.vfx().shake().shakeNearby(loc, 30, ScreenShake.Intensity.CINEMATIC);
                 p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, 1.0f, 1.0f);
@@ -62,11 +63,12 @@ public class WorldListener implements Listener {
     @EventHandler
     public void onWitherKill(EntityDeathEvent event) {
         if (!(event.getEntity() instanceof Wither wither)) return;
+        Location loc = wither.getLocation().clone().add(0, 2, 0);
         for (Player p : event.getEntity().getWorld().getPlayers()) {
+            if (p.getLocation().distance(loc) > 50) continue;
             PlayerData data = plugin.getDataManager().getOrCreatePlayerData(p.getUniqueId());
             if (data.isTwistSelected()) {
                 plugin.getEnergyManager().awardWitherDeath(data);
-                Location loc = wither.getLocation().clone().add(0, 2, 0);
                 ParticlePatterns.explosion(loc, ParticlePatterns.Color.STORM, 3.0f);
                 plugin.vfx().shake().shakeNearby(loc, 25, ScreenShake.Intensity.CINEMATIC);
                 p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0f, 1.0f);

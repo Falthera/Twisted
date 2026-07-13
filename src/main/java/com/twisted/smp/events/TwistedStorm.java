@@ -39,7 +39,6 @@ public class TwistedStorm implements Listener {
         this.dataManager = dataManager;
         this.energyManager = energyManager;
         this.instabilityManager = instabilityManager;
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     public TwistedStorm(TwistedSMP plugin, ConfigManager configManager, com.twisted.smp.core.DataManager dataManager) {
@@ -144,7 +143,7 @@ public class TwistedStorm implements Listener {
                     return;
                 }
                 int freq = configManager.getEventConfig("storm").getInt("lightning-frequency", 20);
-                if (ThreadLocalRandom.current().nextInt(100) < (100 / Math.max(1, freq))) {
+                if (ThreadLocalRandom.current().nextInt(freq) == 0) {
                     for (World world : Bukkit.getWorlds()) {
                         if (world.getPlayers().isEmpty()) continue;
                         Player targetP = world.getPlayers().get(ThreadLocalRandom.current().nextInt(world.getPlayers().size()));

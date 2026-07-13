@@ -46,8 +46,6 @@ public final class TwistedSMP extends JavaPlugin {
     private com.twisted.smp.vfx.VFXManager vfxManager;
     private com.twisted.smp.listeners.PlayerListener playerListener;
 
-    private final Map<UUID, PlayerData> playerDataCache = new ConcurrentHashMap<>();
-
     @Override
     public void onEnable() {
         instance = this;
@@ -66,7 +64,7 @@ public final class TwistedSMP extends JavaPlugin {
 
         configManager = configResult.config();
 
-        databaseManager = new DatabaseManager(this, configManager);
+        databaseManager = new DatabaseManager(this);
         if (!databaseManager.initialize()) {
             getLogger().severe("Failed to initialize database.");
             getServer().getPluginManager().disablePlugin(this);
@@ -77,7 +75,7 @@ public final class TwistedSMP extends JavaPlugin {
         twistManager = new TwistManager(this);
         vfxManager = new com.twisted.smp.vfx.VFXManager(this, configManager);
         abilityManager = new AbilityManager(this, configManager);
-        evolutionManager = new EvolutionManager(this, configManager, dataManager, twistManager);
+        evolutionManager = new EvolutionManager(this, configManager);
         energyManager = new com.twisted.smp.energy.EnergyManager(this, configManager);
         essenceManager = new EssenceManager(this, configManager);
         instabilityManager = new InstabilityManager(this, configManager);
@@ -99,7 +97,26 @@ public final class TwistedSMP extends JavaPlugin {
 
         for (Player online : getServer().getOnlinePlayers()) {
             dataManager.loadPlayerData(online.getUniqueId());
+            antiAbuseManager.loadData(online.getUniqueId());
         }
+
+        getServer().getScheduler().runTaskTimer(this, () -> {
+            for (Player online : getServer().getOnlinePlayers()) {
+                PlayerData data = dataManager.getPlayerData(online.getUniqueId());
+                if (data == null || !data.isTwistSelected()) continue;
+                instabilityManager.tickInstability(data);
+                if (data.getInstability() > 0) {
+                    instabilityManager.applyInstabilityEffects(data);
+                }
+            }
+            antiAbuseManager.tick();
+        }, 20 * 60L, 20 * 60L);
+
+        getServer().getScheduler().runTaskTimer(this, () -> {
+            for (Player online : getServer().getOnlinePlayers()) {
+                antiAbuseManager.addPlaytime(online.getUniqueId(), 1.0 / 60.0);
+            }
+        }, 20L, 20L);
 
         long elapsed = System.currentTimeMillis() - startTime;
         getLogger().info("TwistedSMP enabled successfully in " + elapsed + "ms.");
@@ -128,7 +145,6 @@ public final class TwistedSMP extends JavaPlugin {
             adventure.close();
         }
 
-        playerDataCache.clear();
         instance = null;
         getLogger().info("TwistedSMP disabled.");
     }
@@ -215,18 +231,18 @@ public final class TwistedSMP extends JavaPlugin {
     }
 
     public Map<UUID, PlayerData> getPlayerDataCache() {
-        return playerDataCache;
+        return dataManager.getPlayerDataCache();
     }
 
     public PlayerData getPlayerData(UUID uuid) {
-        return playerDataCache.get(uuid);
+        return dataManager.getPlayerData(uuid);
     }
 
     public PlayerData getPlayerData(Player player) {
-        return playerDataCache.get(player.getUniqueId());
+        return dataManager.getPlayerData(player.getUniqueId());
     }
 
     public PlayerData getOrCreatePlayerData(UUID uuid) {
-        return playerDataCache.computeIfAbsent(uuid, id -> dataManager.loadPlayerData(id));
+        return dataManager.getOrCreatePlayerData(uuid);
     }
 }

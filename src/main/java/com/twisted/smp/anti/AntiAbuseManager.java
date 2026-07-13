@@ -7,8 +7,9 @@ import com.twisted.smp.core.PlayerData;
 
 import java.sql.*;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 public class AntiAbuseManager {
 
@@ -19,11 +20,56 @@ public class AntiAbuseManager {
     private final Map<UUID, String> lastKillTarget = new ConcurrentHashMap<>();
     private final Map<UUID, Integer> killFarmingCount = new ConcurrentHashMap<>();
     private final Map<UUID, Long> lastKillTime = new ConcurrentHashMap<>();
+    private final Map<UUID, Double> playtimeMinutes = new ConcurrentHashMap<>();
 
     public AntiAbuseManager(TwistedSMP plugin, ConfigManager configManager, DatabaseManager databaseManager) {
         this.plugin = plugin;
         this.configManager = configManager;
         this.databaseManager = databaseManager;
+    }
+
+    public void loadData(UUID uuid) {
+        databaseManager.loadAntiAbuseData(uuid, data -> {
+            String lastKillUuidStr = (String) data.get("lastKillUuid");
+            if (lastKillUuidStr != null) {
+                lastKillTarget.put(uuid, lastKillUuidStr);
+            }
+            lastKillTime.put(uuid, ((Number) data.get("lastKillTime")).longValue());
+            killFarmingCount.put(uuid, ((Number) data.get("samePlayerKills")).intValue());
+            playtimeMinutes.put(uuid, ((Number) data.get("playtimeMinutes")).doubleValue());
+            double combatTagEnd = ((Number) data.get("combatTagEnd")).doubleValue();
+            if (combatTagEnd > System.currentTimeMillis()) {
+                combatTagged.put(uuid, (long) combatTagEnd);
+            }
+        });
+    }
+
+    public void saveData(UUID uuid) {
+        String killTarget = lastKillTarget.get(uuid);
+        UUID killTargetUuid = null;
+        if (killTarget != null) {
+            try {
+                killTargetUuid = UUID.fromString(killTarget);
+            } catch (IllegalArgumentException e) {
+                killTargetUuid = null;
+            }
+        }
+        databaseManager.saveAntiAbuseData(
+            uuid,
+            killTargetUuid,
+            lastKillTime.getOrDefault(uuid, 0L),
+            killFarmingCount.getOrDefault(uuid, 0),
+            null,
+            playtimeMinutes.getOrDefault(uuid, 0.0),
+            combatTagged.getOrDefault(uuid, 0L)
+        );
+    }
+
+    public void recordKill(UUID killerUuid, UUID victimUuid) {
+        lastKillTarget.put(killerUuid, victimUuid.toString());
+        lastKillTime.put(killerUuid, System.currentTimeMillis());
+        killFarmingCount.merge(killerUuid, 1, Integer::sum);
+        saveData(killerUuid);
     }
 
     public boolean checkKill(UUID killerUuid, UUID victimUuid) {
@@ -64,12 +110,6 @@ public class AntiAbuseManager {
         return true;
     }
 
-    public void recordKill(UUID killerUuid, UUID victimUuid) {
-        lastKillTarget.put(killerUuid, victimUuid.toString());
-        lastKillTime.put(killerUuid, System.currentTimeMillis());
-        killFarmingCount.merge(killerUuid, 1, Integer::sum);
-    }
-
     public void tagCombat(PlayerData data) {
         int duration = configManager.getConfig().getInt("anti-abuse.combat-logging.tag-duration", 10) * 1000;
         combatTagged.put(data.getUuid(), System.currentTimeMillis() + duration);
@@ -77,7 +117,12 @@ public class AntiAbuseManager {
 
     public boolean isCombatTagged(UUID uuid) {
         Long end = combatTagged.get(uuid);
-        return end != null && end > System.currentTimeMillis();
+        if (end == null) return false;
+        if (end <= System.currentTimeMillis()) {
+            combatTagged.remove(uuid);
+            return false;
+        }
+        return true;
     }
 
     public double getDeathPenalty(UUID uuid) {
@@ -92,6 +137,14 @@ public class AntiAbuseManager {
         data.subtractEnergy(Math.abs(getDeathPenalty(data.getUuid())));
         data.addInstability(getInstabilityPenalty(data.getUuid()));
         plugin.getDataManager().savePlayerData(data, true);
+    }
+
+    public void addPlaytime(UUID uuid, double minutes) {
+        playtimeMinutes.merge(uuid, minutes, Double::sum);
+    }
+
+    public double getPlaytimeMinutes(UUID uuid) {
+        return playtimeMinutes.getOrDefault(uuid, 0.0);
     }
 
     public void tick() {

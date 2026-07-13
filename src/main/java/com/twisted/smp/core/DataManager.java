@@ -58,6 +58,7 @@ public class DataManager {
                             }
                         }
                         data = new PlayerData(uuid, twist, energy, essence, instability, evoStage, kills, deaths, cooldowns, twistSelected, firstJoin);
+                        data.setMaxEnergy(configManager.getConfig().getDouble("energy.max-energy", 200));
                     } else {
                         data = createNewPlayerData(uuid);
                         savePlayerData(data, false);
@@ -78,7 +79,12 @@ public class DataManager {
 
     private PlayerData createNewPlayerData(UUID uuid) {
         long firstJoin = System.currentTimeMillis();
-        return new PlayerData(uuid, Twist.VOID, 0, 0, 0, 1, 0, 0, new HashMap<>(), false, firstJoin);
+        double startingEnergy = configManager.getConfig().getDouble("energy.starting-energy", 0);
+        double startingEssence = configManager.getConfig().getDouble("essence.starting-essence", 0);
+        double maxEnergy = configManager.getConfig().getDouble("energy.max-energy", 200);
+        PlayerData data = new PlayerData(uuid, Twist.VOID, startingEnergy, startingEssence, 0, 1, 0, 0, new HashMap<>(), false, firstJoin, maxEnergy);
+        data.setTwistSelected(false);
+        return data;
     }
 
     public void savePlayerData(PlayerData data, boolean async) {
@@ -127,7 +133,7 @@ public class DataManager {
                     cooldownsBuilder.append(entry.getKey()).append("=").append(entry.getValue());
                 }
                 ps.setString(9, cooldownsBuilder.toString());
-                ps.setDouble(10, System.currentTimeMillis());
+                ps.setLong(10, System.currentTimeMillis());
                 ps.setLong(11, data.getFirstJoin());
                 ps.setInt(12, data.isTwistSelected() ? 1 : 0);
                 ps.executeUpdate();
@@ -146,7 +152,7 @@ public class DataManager {
             """)) {
                 ps.setString(1, uuid.toString());
                 ps.setString(2, ability);
-                ps.setDouble(3, cooldownEnd);
+                ps.setLong(3, cooldownEnd);
                 ps.executeUpdate();
             }
         } catch (Exception e) {
@@ -193,7 +199,7 @@ public class DataManager {
     }
 
     public Set<UUID> getPlayerDataCache() {
-        return cache.keySet();
+        return Collections.unmodifiableSet(cache.keySet());
     }
 
     public void shutdown() {

@@ -162,12 +162,17 @@ public class TwistAdminCommand implements CommandExecutor, TabCompleter {
         try {
             plugin.getConfigManager().reload();
             plugin.getTwistManager().loadTwistConfigs();
-            plugin.getTwistedStorm().stop();
-            plugin.getRiftEvent().stop();
-            sender.sendMessage(MiniMessage.miniMessage().deserialize(configManager.getMessage("admin-reload")));
+            if (plugin.getTwistedStorm() != null && plugin.getTwistedStorm().isActive()) {
+                plugin.getTwistedStorm().stop();
+            }
+            if (plugin.getRiftEvent() != null && plugin.getRiftEvent().isActive()) {
+                plugin.getRiftEvent().stop();
+            }
+            sender.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(configManager.getMessage("admin-reload")));
         } catch (Exception e) {
-            sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>Reload failed: " + e.getMessage()));
+            sender.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize("<red>Reload failed: " + e.getMessage()));
         }
+    }
     }
 
     @Override
@@ -178,13 +183,25 @@ public class TwistAdminCommand implements CommandExecutor, TabCompleter {
                 .filter(s -> s.startsWith(args[0].toLowerCase())).collect(Collectors.toList());
         }
         if (args.length == 2) {
-            if ("event".equals(args[0].toLowerCase()) || "set".equals(args[0].toLowerCase())
-                || "giveenergy".equals(args[0].toLowerCase()) || "giveessence".equals(args[0].toLowerCase())) {
-                if ("event".equals(args[0].toLowerCase())) {
-                    return List.of("start", "stop");
-                }
+            String sub = args[0].toLowerCase();
+            if (sub.equals("set") || sub.equals("giveenergy") || sub.equals("giveessence")) {
                 return Bukkit.getOnlinePlayers().stream().map(Player::getName)
                     .filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase())).collect(Collectors.toList());
+            }
+            if (sub.equals("event")) {
+                return List.of("start", "stop").stream()
+                    .filter(s -> s.startsWith(args[1].toLowerCase())).collect(Collectors.toList());
+            }
+        }
+        if (args.length == 3) {
+            String sub = args[0].toLowerCase();
+            if (sub.equals("set")) {
+                return java.util.Arrays.stream(Twist.values()).map(Twist::configId)
+                    .filter(s -> s.startsWith(args[2].toLowerCase())).collect(Collectors.toList());
+            }
+            if (sub.equals("event")) {
+                return List.of("storm", "rift").stream()
+                    .filter(s -> s.startsWith(args[2].toLowerCase())).collect(Collectors.toList());
             }
         }
         return List.of();

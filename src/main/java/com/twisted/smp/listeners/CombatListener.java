@@ -139,10 +139,30 @@ public class CombatListener implements Listener {
                 multiplier *= 0.7;
             }
             event.setDamage(damage * multiplier);
+
+            if (damage > 0 && attackerData != null && attackerData.isTwistSelected()) {
+                antiAbuse.tagCombat(victimData);
+                antiAbuse.tagCombat(attackerData);
+            }
         } else if (event.getDamager() instanceof org.bukkit.entity.Projectile projectile) {
             double multiplier = victimData.getTwist() == Twist.VOID ? 1.5 : 1.0;
             event.setDamage(damage * multiplier);
+
+            Player shooter = getProjectileShooter(projectile);
+            if (shooter != null) {
+                PlayerData shooterData = dataManager.loadPlayerData(shooter.getUniqueId());
+                if (shooterData != null && shooterData.isTwistSelected()) {
+                    antiAbuse.tagCombat(victimData);
+                }
+            }
         }
+    }
+
+    private Player getProjectileShooter(org.bukkit.entity.Projectile projectile) {
+        if (projectile.getShooter() instanceof Player player) {
+            return player;
+        }
+        return null;
     }
 
     @EventHandler
