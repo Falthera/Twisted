@@ -64,7 +64,7 @@ public enum Twist {
                 return twist;
             }
         }
-        return VOID;
+        return null;
     }
 
     public static List<Twist> getAllTwists() {

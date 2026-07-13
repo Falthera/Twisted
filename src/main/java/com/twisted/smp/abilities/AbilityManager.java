@@ -171,7 +171,7 @@ public class AbilityManager {
             shake.shakeWorld(player.getWorld(), ScreenShake.Intensity.HEAVY);
             sounds.playAbilitySound(loc, SoundDesigner.SoundDesign.EARTHQUAKE, stage >= 2);
 
-            for (org.bukkit.entity.Entity e : loc.getWorld().getNearbyEntities(loc, radius, 2, radius)) {
+            for (org.bukkit.entity.Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
                 if (e instanceof LivingEntity target && target != player && !target.isDead()) {
                     double distance = target.getLocation().distance(loc);
                     if (distance <= radius) {
@@ -370,7 +370,7 @@ public class AbilityManager {
             loc.getWorld().spawnParticle(org.bukkit.Particle.FLAME, loc, 25, 0.2, 0.2, 0.2, 0.04);
             loc.getWorld().spawnParticle(org.bukkit.Particle.SOUL_FIRE_FLAME, loc, 15, 0.5, 0.3, 0.5, 0.03);
 
-            for (org.bukkit.entity.Entity e : loc.getWorld().getNearbyEntities(loc, radius, 3, radius)) {
+            for (org.bukkit.entity.Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
                 if (e instanceof LivingEntity target && target != player && !target.isDead()) {
                     target.setFireTicks(igniteDuration * 20);
                     target.damage(Math.max(1, (double) igniteDuration / 2), player);
@@ -441,7 +441,7 @@ public class AbilityManager {
             sounds.playAbilitySound(loc, SoundDesigner.SoundDesign.FREEZE, stage >= 2);
             player.getWorld().playSound(loc, Sound.BLOCK_GLASS_HIT, 1.0f, 1.2f);
 
-            for (org.bukkit.entity.Entity e : loc.getWorld().getNearbyEntities(loc, radius, 4, radius)) {
+            for (org.bukkit.entity.Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
                 if (e instanceof LivingEntity target && !target.isDead()) {
                     if (target == player && !freezeSelf) continue;
                     int amplifier = Math.max(0, slownessLevel - 1);

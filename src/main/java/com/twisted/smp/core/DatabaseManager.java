@@ -76,6 +76,16 @@ public class DatabaseManager {
     }
 
     public synchronized java.sql.Connection getConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                String dbPath = new File(plugin.getDataFolder(), "twisted-data.db").getAbsolutePath();
+                String url = "jdbc:sqlite:" + dbPath;
+                connection = java.sql.DriverManager.getConnection(url);
+                connection.setAutoCommit(true);
+            }
+        } catch (Exception e) {
+            plugin.getLogger().severe("Failed to get database connection: " + e.getMessage());
+        }
         return connection;
     }
 

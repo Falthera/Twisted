@@ -95,6 +95,7 @@ public class TwistedStorm implements Listener {
         active = false;
         if (effectListener != null) {
             effectListener.deactivate();
+            plugin.getServer().getPluginManager().unregisterEvents(effectListener, plugin);
         }
         if (task != null) {
             task.cancel();

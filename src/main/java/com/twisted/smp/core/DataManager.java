@@ -109,29 +109,29 @@ public class DataManager {
     private void savePlayerDataSync(PlayerData data) {
         try {
             Connection conn = databaseManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement("""
+            try (PreparedStatement ps = conn.prepareStatement("""
                 INSERT OR REPLACE INTO player_data (uuid, twist, energy, essence, instability, evolution_stage, kills, deaths, ability_cooldowns, last_save, first_join, twist_selected)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """);
-            ps.setString(1, data.getUuid().toString());
-            ps.setString(2, data.getTwist().name());
-            ps.setDouble(3, data.getEnergy());
-            ps.setDouble(4, data.getEssence());
-            ps.setDouble(5, data.getInstability());
-            ps.setInt(6, data.getEvolutionStage());
-            ps.setInt(7, data.getKills());
-            ps.setInt(8, data.getDeaths());
-            StringBuilder cooldownsBuilder = new StringBuilder();
-            for (Map.Entry<String, Long> entry : data.getAbilityCooldowns().entrySet()) {
-                if (cooldownsBuilder.length() > 0) cooldownsBuilder.append(";");
-                cooldownsBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+            """)) {
+                ps.setString(1, data.getUuid().toString());
+                ps.setString(2, data.getTwist().name());
+                ps.setDouble(3, data.getEnergy());
+                ps.setDouble(4, data.getEssence());
+                ps.setDouble(5, data.getInstability());
+                ps.setInt(6, data.getEvolutionStage());
+                ps.setInt(7, data.getKills());
+                ps.setInt(8, data.getDeaths());
+                StringBuilder cooldownsBuilder = new StringBuilder();
+                for (Map.Entry<String, Long> entry : data.getAbilityCooldowns().entrySet()) {
+                    if (cooldownsBuilder.length() > 0) cooldownsBuilder.append(";");
+                    cooldownsBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+                }
+                ps.setString(9, cooldownsBuilder.toString());
+                ps.setDouble(10, System.currentTimeMillis());
+                ps.setLong(11, data.getFirstJoin());
+                ps.setInt(12, data.isTwistSelected() ? 1 : 0);
+                ps.executeUpdate();
             }
-            ps.setString(9, cooldownsBuilder.toString());
-            ps.setDouble(10, System.currentTimeMillis());
-            ps.setLong(11, data.getFirstJoin());
-            ps.setInt(12, data.isTwistSelected() ? 1 : 0);
-            ps.executeUpdate();
-            ps.close();
             databaseManager.updateLastSave(data.getUuid());
         } catch (Exception e) {
             plugin.getLogger().warning("Failed to save player data for " + data.getUuid() + ": " + e.getMessage());
@@ -141,14 +141,14 @@ public class DataManager {
     public void saveCooldown(UUID uuid, String ability, long cooldownEnd) {
         try {
             Connection conn = databaseManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement("""
+            try (PreparedStatement ps = conn.prepareStatement("""
                 INSERT OR REPLACE INTO ability_cooldowns (uuid, ability, cooldown_end) VALUES (?, ?, ?)
-            """);
-            ps.setString(1, uuid.toString());
-            ps.setString(2, ability);
-            ps.setDouble(3, cooldownEnd);
-            ps.executeUpdate();
-            ps.close();
+            """)) {
+                ps.setString(1, uuid.toString());
+                ps.setString(2, ability);
+                ps.setDouble(3, cooldownEnd);
+                ps.executeUpdate();
+            }
         } catch (Exception e) {
             plugin.getLogger().warning("Failed to save cooldown: " + e.getMessage());
         }
@@ -157,15 +157,15 @@ public class DataManager {
     public void loadCooldown(UUID uuid, String ability, java.util.function.Consumer<Long> consumer) {
         try {
             Connection conn = databaseManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT cooldown_end FROM ability_cooldowns WHERE uuid = ? AND ability = ?");
-            ps.setString(1, uuid.toString());
-            ps.setString(2, ability);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                consumer.accept(rs.getLong("cooldown_end"));
+            try (PreparedStatement ps = conn.prepareStatement("SELECT cooldown_end FROM ability_cooldowns WHERE uuid = ? AND ability = ?")) {
+                ps.setString(1, uuid.toString());
+                ps.setString(2, ability);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        consumer.accept(rs.getLong("cooldown_end"));
+                    }
+                }
             }
-            rs.close();
-            ps.close();
         } catch (Exception e) {
             // ignore
         }
@@ -174,11 +174,11 @@ public class DataManager {
     public void removeCooldown(UUID uuid, String ability) {
         try {
             Connection conn = databaseManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement("DELETE FROM ability_cooldowns WHERE uuid = ? AND ability = ?");
-            ps.setString(1, uuid.toString());
-            ps.setString(2, ability);
-            ps.executeUpdate();
-            ps.close();
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM ability_cooldowns WHERE uuid = ? AND ability = ?")) {
+                ps.setString(1, uuid.toString());
+                ps.setString(2, ability);
+                ps.executeUpdate();
+            }
         } catch (Exception e) {
             // ignore
         }

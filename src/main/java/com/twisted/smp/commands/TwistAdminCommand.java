@@ -59,6 +59,10 @@ public class TwistAdminCommand implements CommandExecutor, TabCompleter {
             return;
         }
         Twist twist = Twist.fromConfigId(args[2]);
+        if (twist == null) {
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>Unknown twist: " + args[2]));
+            return;
+        }
         PlayerData data = plugin.getDataManager().getOrCreatePlayerData(target.getUniqueId());
         data.setTwist(twist);
         data.setTwistSelected(true);

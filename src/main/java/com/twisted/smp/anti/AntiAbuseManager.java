@@ -34,15 +34,26 @@ public class AntiAbuseManager {
         int cooldown = configManager.getConfig().getInt("anti-abuse.kill-farming.cooldown", 60) * 1000;
         long now = System.currentTimeMillis();
 
-        if (lastKillTarget.containsKey(killerUuid) &&
-            victimUuid.equals(UUID.fromString(lastKillTarget.get(killerUuid)))) {
-            long lastKill = lastKillTime.getOrDefault(killerUuid, 0L);
-            if (now - lastKill < cooldown) {
-                int count = killFarmingCount.merge(killerUuid, 1, Integer::sum);
-                if (count >= configManager.getConfig().getInt("anti-abuse.kill-farming.max-kills-before-penalty", 3)) {
-                    return false;
+        if (lastKillTarget.containsKey(killerUuid)) {
+            String victimStr = lastKillTarget.get(killerUuid);
+            try {
+                UUID lastVictimUuid = UUID.fromString(victimStr);
+                if (victimUuid.equals(lastVictimUuid)) {
+                    long lastKill = lastKillTime.getOrDefault(killerUuid, 0L);
+                    if (now - lastKill < cooldown) {
+                        int count = killFarmingCount.merge(killerUuid, 1, Integer::sum);
+                        if (count >= configManager.getConfig().getInt("anti-abuse.kill-farming.max-kills-before-penalty", 3)) {
+                            return false;
+                        }
+                    } else {
+                        killFarmingCount.put(killerUuid, 1);
+                    }
+                } else {
+                    lastKillTarget.put(killerUuid, victimUuid.toString());
+                    killFarmingCount.put(killerUuid, 1);
                 }
-            } else {
+            } catch (IllegalArgumentException e) {
+                lastKillTarget.put(killerUuid, victimUuid.toString());
                 killFarmingCount.put(killerUuid, 1);
             }
         } else {
