@@ -54,6 +54,10 @@ public class CombatListener implements Listener {
             PlayerData killerData = dataManager.getOrCreatePlayerData(killer.getUniqueId());
 
             boolean canGiveEnergy = antiAbuse.checkKill(killer.getUniqueId(), victim.getUniqueId());
+            if (canGiveEnergy && antiAbuse.checkAltFarming(killer.getUniqueId(), victim.getUniqueId())) {
+                canGiveEnergy = false;
+                killer.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Kill reward denied: same-IP farming not permitted (30 min playtime required)."));
+            }
             double energyGain = configManager.getConfig().getDouble("energy.kill-reward", 25);
             double energyLoss = configManager.getConfig().getDouble("energy.death-penalty", -35);
 
@@ -98,6 +102,7 @@ public class CombatListener implements Listener {
 
             plugin.getEnergyManager().subtractEnergy(victimData, Math.abs(energyLoss));
             victimData.addDeath();
+            victim.playSound(victim.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 0.7f, 0.4f);
             victim.sendMessage(MiniMessage.miniMessage().deserialize(
                 configManager.getMessage("killed-by-player", "killer", killer.getName(), "energy", String.valueOf((int) Math.abs(energyLoss)))));
 
@@ -140,9 +145,18 @@ public class CombatListener implements Listener {
             double multiplier = 1.0;
             if (attackerData != null && attackerData.isTwistSelected()) {
                 multiplier *= plugin.getEnergyManager().getEffectivenessMultiplier(attackerData.getTwist(), attackerData.getEnergy());
+                if (attackerData.getTwist() == Twist.BERSERKER) {
+                    org.bukkit.attribute.AttributeInstance maxHealth = attacker.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH);
+                    double maxHp = maxHealth != null ? maxHealth.getValue() : 20.0;
+                    double healthPercent = attacker.getHealth() / maxHp;
+                    double lowHealthMult = configManager.getTwistConfig("berserker").getDouble("passive.low-health-damage-multiplier", 2.0);
+                    multiplier *= 1.0 + Math.max(0, 1.0 - healthPercent) * (lowHealthMult - 1.0);
+                }
             }
             if (victimData.getTwist() == Twist.PHANTOM) {
-                multiplier *= 0.6;
+                org.bukkit.configuration.ConfigurationSection phantomConfig = configManager.getTwistConfig("phantom");
+                double armorMult = phantomConfig != null ? phantomConfig.getDouble("passive.armor-effectiveness-multiplier", 0.6) : 0.6;
+                multiplier *= armorMult;
             } else if (victimData.getTwist() == Twist.TITAN) {
                 multiplier *= 0.7;
             }

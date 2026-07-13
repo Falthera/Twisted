@@ -56,6 +56,10 @@ public class PlayerListener implements Listener {
 
         data.writeToPersistentData(player.getPersistentDataContainer());
 
+        if (player.getAddress() != null && player.getAddress().getAddress() != null) {
+            plugin.getAntiAbuseManager().recordPlayerJoin(player.getUniqueId(), player.getAddress().getAddress().getHostAddress());
+        }
+
         if (!data.isTwistSelected()) {
             if (!player.hasPlayedBefore()) {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -71,6 +75,10 @@ public class PlayerListener implements Listener {
 
         refreshPassiveEffects(player, data);
         plugin.getDataManager().savePlayerData(data, true);
+
+        if (data.isTwistSelected()) {
+            plugin.getScoreboardManager().update(player);
+        }
     }
 
     @EventHandler
@@ -241,20 +249,128 @@ public class PlayerListener implements Listener {
         }
 
         if (displayName.contains("Rift Key")) {
-            if (plugin.getRiftEvent() != null && !plugin.getRiftEvent().isActive()) {
+            if (plugin.getRiftEvent() == null) {
+                player.sendMessage(MiniMessage.miniMessage().deserialize("<red>Rift Events are not available."));
+                event.setCancelled(true);
+                return;
+            }
+            if (!plugin.getRiftEvent().isActive()) {
                 plugin.getRiftEvent().start();
                 if (item.getAmount() > 1) {
                     item.setAmount(item.getAmount() - 1);
                 } else {
                     player.getInventory().remove(item);
                 }
-                player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(
+                player.sendMessage(MiniMessage.miniMessage().deserialize(
                     "<dark_aqua>You have summoned a Rift Event!"));
                 plugin.getDataManager().savePlayerData(data, true);
             } else {
-                player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(
+                player.sendMessage(MiniMessage.miniMessage().deserialize(
                     "<red>A Rift Event is already active."));
             }
+            event.setCancelled(true);
+            return;
+        }
+
+        if (displayName.contains("Twisted Core")) {
+            if (item.getAmount() > 1) {
+                item.setAmount(item.getAmount() - 1);
+            } else {
+                player.getInventory().remove(item);
+            }
+            double rerollCost = plugin.getConfigManager().getConfig().getDouble("essence.twist-change-cost", 100);
+            if (data.getEssence() < rerollCost) {
+                player.sendMessage(MiniMessage.miniMessage().deserialize(
+                    plugin.getConfigManager().getMessage("essence-insufficient", "amount",
+                        String.valueOf((int) rerollCost), "have", String.valueOf((int) data.getEssence()))));
+                event.setCancelled(true);
+                return;
+            }
+            java.util.List<Twist> available = new java.util.ArrayList<>(Twist.getAllTwists());
+            available.remove(data.getTwist());
+            if (available.isEmpty()) {
+                player.sendMessage(MiniMessage.miniMessage().deserialize("<red>No other twists available."));
+                event.setCancelled(true);
+                return;
+            }
+            Twist newTwist = available.get(new java.util.Random().nextInt(available.size()));
+            data.subtractEssence(rerollCost);
+            data.setTwist(newTwist);
+            data.setTwistSelected(true);
+            data.writeToPersistentData(player.getPersistentDataContainer());
+            plugin.getDataManager().savePlayerData(data, true);
+            refreshPassiveEffects(player, data);
+            String newName = twistManager.getTwistDisplayName(newTwist);
+            player.sendMessage(MiniMessage.miniMessage().deserialize(
+                "<green>Twisted Core! New twist: <white>" + newName + "</white>"));
+            plugin.vfx().sounds().playTwistSelectSound(player);
+            plugin.vfx().holograms().spawnTextHologram(player.getLocation().clone().add(0, 2.0, 0),
+                "§d§lTWIST CHANGE", 40, net.kyori.adventure.text.format.TextColor.color(0xa29bfe));
+            event.setCancelled(true);
+            return;
+        }
+
+        if (displayName.contains("Verity Crown")) {
+            if (item.getAmount() > 1) {
+                item.setAmount(item.getAmount() - 1);
+            } else {
+                player.getInventory().remove(item);
+            }
+            int extraEnergy = 25;
+            plugin.getEnergyManager().addEnergy(data, extraEnergy);
+            player.sendMessage(MiniMessage.miniMessage().deserialize(
+                "<gold>Verity Crown activated! +" + extraEnergy + " energy."));
+            plugin.vfx().sounds().playAbilitySound(player.getLocation(), SoundDesigner.SoundDesign.VOID_STEP, true);
+            player.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, player.getLocation(), 20, 0.5, 1.0, 0.5, 0.05);
+            event.setCancelled(true);
+            return;
+        }
+
+        if (displayName.contains("Verity Talisman")) {
+            if (item.getAmount() > 1) {
+                item.setAmount(item.getAmount() - 1);
+            } else {
+                player.getInventory().remove(item);
+            }
+            if (data.getEssence() > 0) {
+                double convertRatio = 2.0;
+                double converted = Math.min(data.getEssence(), 50);
+                data.subtractEssence(converted);
+                plugin.getEnergyManager().addEnergy(data, converted * convertRatio);
+                player.sendMessage(MiniMessage.miniMessage().deserialize(
+                    "<gold>Verity Talisman converts " + (int) converted + " Essence to " + (int) (converted * convertRatio) + " Energy!"));
+            } else {
+                player.sendMessage(MiniMessage.miniMessage().deserialize(
+                    "<red>No Essence to convert. Deposit Essence first."));
+            }
+            plugin.getDataManager().savePlayerData(data, true);
+            event.setCancelled(true);
+            return;
+        }
+
+        if (displayName.contains("Verity Focus")) {
+            if (data.isOnCooldown("verity_focus")) {
+                long remaining = data.getCooldownRemaining("verity_focus");
+                player.sendMessage(MiniMessage.miniMessage().deserialize(
+                    "<red>Verity Focus on cooldown! " + (remaining / 1000) + "s remaining."));
+                event.setCancelled(true);
+                return;
+            }
+            if (item.getAmount() > 1) {
+                item.setAmount(item.getAmount() - 1);
+            } else {
+                player.getInventory().remove(item);
+            }
+            data.subtractInstability(100);
+            player.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.ABSORPTION, 20 * 20, 0, false, false));
+            player.sendMessage(MiniMessage.miniMessage().deserialize(
+                "<#a29bfe>Verity Focus absorbs all instability and grants Absorption."));
+            plugin.vfx().sounds().playAbilitySound(player.getLocation(), SoundDesigner.SoundDesign.FADE, true);
+            player.getWorld().spawnParticle(Particle.END_ROD, player.getLocation(), 30, 0.5, 1.0, 0.5, 0.04);
+            long cooldownEnd = System.currentTimeMillis() + 60_000L;
+            data.putCooldown("verity_focus", cooldownEnd);
+            plugin.getDataManager().savePlayerData(data, true);
             event.setCancelled(true);
             return;
         }
@@ -262,6 +378,16 @@ public class PlayerListener implements Listener {
         org.bukkit.Material abilityMat = null;
         if (data.getTwist() == Twist.VOID) {
             abilityMat = org.bukkit.Material.CHORUS_FRUIT;
+        } else if (data.getTwist() == Twist.INFERNAL) {
+            abilityMat = org.bukkit.Material.BLAZE_ROD;
+        } else if (data.getTwist() == Twist.FROSTBORN) {
+            abilityMat = org.bukkit.Material.PACKED_ICE;
+        } else if (data.getTwist() == Twist.TITAN) {
+            abilityMat = org.bukkit.Material.COBBLESTONE;
+        } else if (data.getTwist() == Twist.BERSERKER) {
+            abilityMat = org.bukkit.Material.REDSTONE;
+        } else if (data.getTwist() == Twist.PHANTOM) {
+            abilityMat = org.bukkit.Material.GLASS;
         }
         if (abilityMat != null && item.getType() == abilityMat) {
             event.setCancelled(true);
@@ -331,6 +457,14 @@ public class PlayerListener implements Listener {
                     if (speed != null) {
                         speed.setBaseValue(0.1 * speedMult);
                     }
+                }
+                double miningMult = config != null ? config.getDouble("passive.mining-speed-multiplier", 1.0) : 1.0;
+                if (miningMult < 1.0) {
+                    player.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                        org.bukkit.potion.PotionEffectType.MINING_FATIGUE, Integer.MAX_VALUE, (int) Math.ceil((1.0 - miningMult) * 3), false, false));
+                } else if (miningMult > 1.0) {
+                    player.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                        org.bukkit.potion.PotionEffectType.FAST_DIGGING, Integer.MAX_VALUE, (int) Math.floor(miningMult - 1), false, false));
                 }
             }
             default -> {}

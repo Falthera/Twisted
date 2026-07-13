@@ -18,7 +18,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -86,10 +85,46 @@ public class WorldListener implements Listener {
             Block block = event.getClickedBlock();
             if (block != null && block.getType() == Material.CHEST) {
                 RiftEvent rift = plugin.getRiftEvent();
-                if (rift.isActive() && block.getLocation().distance(rift.getRiftLocation()) < 20) {
+                if (rift != null && rift.isActive() && block.getLocation().distance(rift.getRiftLocation()) < 20) {
                     Bukkit.getScheduler().runTask(plugin, () -> rift.openRiftChest(event.getPlayer()));
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        PlayerData data = plugin.getDataManager().loadPlayerData(player.getUniqueId());
+        if (data == null || !data.isTwistSelected()) return;
+
+        ItemStack hand = player.getInventory().getItemInMainHand();
+        if (hand == null || !hand.hasItemMeta() || !hand.getItemMeta().hasDisplayName()) return;
+        if (!hand.getItemMeta().getDisplayName().contains("Essence Extractor")) return;
+
+        Material type = event.getBlock().getType();
+        int essence = getEssenceValue(type);
+        if (essence <= 0) return;
+
+        data.addEssence(essence);
+        plugin.getDataManager().savePlayerData(data, true);
+        player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(
+            plugin.getConfigManager().getMessage("essence-gain", "amount", String.valueOf(essence), "new", String.valueOf((int) data.getEssence()))));
+
+        player.getWorld().spawnParticle(org.bukkit.Particle.ENCHANT, event.getBlock().getLocation().add(0.5, 0.5, 0.5), 10, 0.3, 0.3, 0.3, 0.02);
+        player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.6f, 1.5f);
+    }
+
+    private int getEssenceValue(Material type) {
+        if (type == Material.NETHER_QUARTZ_ORE || type == Material.NETHER_GOLD_ORE) return 1;
+        if (type == Material.IRON_ORE || type == Material.DEEPSLATE_IRON_ORE) return 2;
+        if (type == Material.COPPER_ORE || type == Material.DEEPSLATE_COPPER_ORE) return 2;
+        if (type == Material.GOLD_ORE || type == Material.DEEPSLATE_GOLD_ORE || type == Material.NETHER_GOLD_ORE) return 3;
+        if (type == Material.REDSTONE_ORE || type == Material.DEEPSLATE_REDSTONE_ORE) return 3;
+        if (type == Material.LAPIS_ORE || type == Material.DEEPSLATE_LAPIS_ORE) return 4;
+        if (type == Material.DIAMOND_ORE || type == Material.DEEPSLATE_DIAMOND_ORE) return 8;
+        if (type == Material.EMERALD_ORE || type == Material.DEEPSLATE_EMERALD_ORE) return 10;
+        if (type == Material.ANCIENT_DEBRIS) return 15;
+        return 0;
     }
 }

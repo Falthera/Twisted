@@ -13,7 +13,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
+import org.bukkit.event.entity.RegainHealthEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+
+import java.util.Random;
 
 public class EntityListener implements Listener {
 
@@ -22,6 +25,7 @@ public class EntityListener implements Listener {
     private final ConfigManager configManager;
     private final com.twisted.smp.twists.TwistManager twistManager;
     private final com.twisted.smp.abilities.AbilityManager abilityManager;
+    private final java.util.Random random = new java.util.Random();
 
     public EntityListener(TwistedSMP plugin, DataManager dataManager, com.twisted.smp.twists.TwistManager twistManager, com.twisted.smp.abilities.AbilityManager abilityManager) {
         this.plugin = plugin;
@@ -67,6 +71,23 @@ public class EntityListener implements Listener {
                 event.setCancelled(true);
             }
         }
+        if (event.getCause() == EntityDamageEvent.DamageCause.LAVA) {
+            if (data.getTwist() == com.twisted.smp.twists.Twist.INFERNAL) {
+                event.setCancelled(true);
+            }
+        }
+        if (event.getCause() == EntityDamageEvent.DamageCause.FIRE || event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK) {
+            if (data.getTwist() == com.twisted.smp.twists.Twist.FROSTBORN) {
+                double mult = configManager.getTwistConfig("frostborn").getDouble("passive.fire-damage-multiplier", 1.5);
+                event.setDamage(event.getDamage() * mult);
+            }
+        }
+        if (event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
+            if (data.getTwist() == com.twisted.smp.twists.Twist.PHANTOM) {
+                double armorMult = configManager.getTwistConfig("phantom").getDouble("passive.armor-effectiveness-multiplier", 0.6);
+                event.setDamage(event.getDamage() * armorMult);
+            }
+        }
     }
 
     @EventHandler
@@ -77,6 +98,21 @@ public class EntityListener implements Listener {
 
         if (data.getTwist() == com.twisted.smp.twists.Twist.VOID) {
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 1.0f, 0.8f);
+        }
+    }
+
+    @EventHandler
+    public void onRegainHealth(RegainHealthEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
+        if (data == null || !data.isTwistSelected()) return;
+
+        if (data.getTwist() == Twist.BERSERKER && event.getRegainReason() == RegainHealthEvent.RegainReason.SATIATED) {
+            org.bukkit.configuration.ConfigurationSection berserkerConfig = configManager.getTwistConfig("berserker");
+            double regenReduction = berserkerConfig != null ? berserkerConfig.getDouble("passive.natural-regen-reduction", 0.5) : 0.5;
+            if (random.nextDouble() < regenReduction) {
+                event.setCancelled(true);
+            }
         }
     }
 }

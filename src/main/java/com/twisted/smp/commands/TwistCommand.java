@@ -54,6 +54,7 @@ public class TwistCommand implements CommandExecutor, TabCompleter {
             case "evolve" -> handleEvolve(sender);
             case "gui" -> handleGUI(sender);
             case "withdraw" -> handleWithdraw(sender, args);
+            case "reroll" -> handleReroll(sender);
             default -> showHelp(sender);
         }
         return true;
@@ -68,6 +69,7 @@ public class TwistCommand implements CommandExecutor, TabCompleter {
             .append(Component.newline())
             .append(Component.text("/twist ability", NamedTextColor.YELLOW).hoverEvent(HoverEvent.showText(Component.text("Use your Twist ability"))))
             .append(Component.text("/twist evolve", NamedTextColor.YELLOW).hoverEvent(HoverEvent.showText(Component.text("Evolve your Twist"))))
+            .append(Component.text("/twist reroll", NamedTextColor.YELLOW).hoverEvent(HoverEvent.showText(Component.text("Reroll your Twist for 100 Essence"))))
             .append(Component.text("/twist withdraw <amount>", NamedTextColor.YELLOW).hoverEvent(HoverEvent.showText(Component.text("Convert essence to items"))));
         player.sendMessage(message);
     }
@@ -219,11 +221,48 @@ public class TwistCommand implements CommandExecutor, TabCompleter {
         twistManager.openTwistSelectionGUI(player);
     }
 
+    private void handleReroll(CommandSender sender) {
+        if (!(sender instanceof Player player)) return;
+        PlayerData data = plugin.getDataManager().loadPlayerData(player.getUniqueId());
+        if (data == null || !data.isTwistSelected()) {
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<red>You have not selected a twist yet!"));
+            return;
+        }
+
+        double rerollCost = plugin.getConfigManager().getConfig().getDouble("essence.twist-change-cost", 100);
+        if (data.getEssence() < rerollCost) {
+            player.sendMessage(MiniMessage.miniMessage().deserialize(
+                plugin.getConfigManager().getMessage("essence-insufficient", "amount", String.valueOf((int) rerollCost), "have", String.valueOf((int) data.getEssence()))));
+            return;
+        }
+
+        java.util.List<Twist> available = new java.util.ArrayList<>(Twist.getAllTwists());
+        available.remove(data.getTwist());
+        if (available.isEmpty()) {
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<red>No other twists available to reroll to."));
+            return;
+        }
+        Twist newTwist = available.get(new java.util.Random().nextInt(available.size()));
+
+        data.subtractEssence(rerollCost);
+        data.setTwist(newTwist);
+        data.setTwistSelected(true);
+        data.writeToPersistentData(player.getPersistentDataContainer());
+        plugin.getDataManager().savePlayerData(data, true);
+
+        String newName = twistManager.getTwistDisplayName(newTwist);
+        player.sendMessage(MiniMessage.miniMessage().deserialize(
+            "<green>Rerolled! Your new twist is <white>" + newName + "</white>. Cost: <dark_purple>" + (int) rerollCost + " Essence</dark_purple>."));
+        plugin.vfx().sounds().playTwistSelectSound(player);
+        plugin.vfx().holograms().spawnTextHologram(player.getLocation().clone().add(0, 2.0, 0),
+            "§d§lTWIST REROLL", 40, net.kyori.adventure.text.format.TextColor.color(0xa29bfe));
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!(sender instanceof Player)) return List.of();
         if (args.length == 1) {
-            return Arrays.asList("stats", "ability", "evolve", "gui").stream()
+            return Arrays.asList("stats", "ability", "evolve", "gui", "reroll", "withdraw").stream()
                 .filter(s -> s.startsWith(args[0].toLowerCase()))
                 .collect(Collectors.toList());
         }

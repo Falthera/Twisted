@@ -21,11 +21,32 @@ public class AntiAbuseManager {
     private final Map<UUID, Integer> killFarmingCount = new ConcurrentHashMap<>();
     private final Map<UUID, Long> lastKillTime = new ConcurrentHashMap<>();
     private final Map<UUID, Double> playtimeMinutes = new ConcurrentHashMap<>();
+    private final Map<UUID, String> lastKnownIp = new ConcurrentHashMap<>();
 
     public AntiAbuseManager(TwistedSMP plugin, ConfigManager configManager, DatabaseManager databaseManager) {
         this.plugin = plugin;
         this.configManager = configManager;
         this.databaseManager = databaseManager;
+    }
+
+    public void recordPlayerJoin(UUID uuid, String ip) {
+        if (ip != null && !ip.isEmpty()) {
+            lastKnownIp.put(uuid, ip);
+        }
+    }
+
+    public boolean checkAltFarming(UUID killer, UUID victim) {
+        if (!configManager.getConfig().getBoolean("anti-abuse.alt-farming.enabled", true)) return false;
+
+        String killerIp = lastKnownIp.get(killer);
+        String victimIp = lastKnownIp.get(victim);
+        if (killerIp == null || victimIp == null || !killerIp.equals(victimIp)) return false;
+
+        double minPlaytime = configManager.getConfig().getDouble("anti-abuse.alt-farming.min-playtime", 30);
+        double killerPlaytime = playtimeMinutes.getOrDefault(killer, 0.0);
+        double victimPlaytime = playtimeMinutes.getOrDefault(victim, 0.0);
+
+        return killerPlaytime < minPlaytime || victimPlaytime < minPlaytime;
     }
 
     public void loadData(UUID uuid) {
@@ -37,6 +58,10 @@ public class AntiAbuseManager {
             lastKillTime.put(uuid, ((Number) data.get("lastKillTime")).longValue());
             killFarmingCount.put(uuid, ((Number) data.get("samePlayerKills")).intValue());
             playtimeMinutes.put(uuid, ((Number) data.get("playtimeMinutes")).doubleValue());
+            String ip = (String) data.get("lastIp");
+            if (ip != null) {
+                lastKnownIp.put(uuid, ip);
+            }
             double combatTagEnd = ((Number) data.get("combatTagEnd")).doubleValue();
             if (combatTagEnd > System.currentTimeMillis()) {
                 combatTagged.put(uuid, (long) combatTagEnd);
@@ -54,12 +79,13 @@ public class AntiAbuseManager {
                 killTargetUuid = null;
             }
         }
+        String currentIp = lastKnownIp.get(uuid);
         databaseManager.saveAntiAbuseData(
             uuid,
             killTargetUuid,
             lastKillTime.getOrDefault(uuid, 0L),
             killFarmingCount.getOrDefault(uuid, 0),
-            null,
+            currentIp,
             playtimeMinutes.getOrDefault(uuid, 0.0),
             combatTagged.getOrDefault(uuid, 0L)
         );

@@ -185,9 +185,11 @@ public class AbilityManager {
         @Override
         boolean execute(Player player, PlayerData data) {
             int stage = data.getEvolutionStage();
-            double radius = 6 + (stage - 1) * 2;
-            double damage = 3 + (stage - 1) * 1;
-            double kby = 0.8 + (stage - 1) * 0.3;
+            var titanConfig = plugin.getConfigManager().getTwistConfig("titan").getConfigurationSection("ability");
+            double radius = titanConfig != null ? titanConfig.getDouble(("stage-" + stage + ".radius"), titanConfig.getDouble("radius", 6)) : 6;
+            double damage = titanConfig != null ? titanConfig.getDouble(("stage-" + stage + ".damage"), titanConfig.getDouble("damage", 3)) : 3;
+            double kby = titanConfig != null ? titanConfig.getDouble("knockback-vertical", 0.8) : 0.8;
+            double kbh = titanConfig != null ? titanConfig.getDouble("knockback-horizontal", 1.2) : 1.2;
             Location loc = player.getLocation();
 
             VFXManager engine = plugin.vfx();
@@ -205,6 +207,8 @@ public class AbilityManager {
                         Vector kb = target.getLocation().toVector().subtract(loc.toVector()).normalize();
                         kb.setY(kby);
                         kb.multiply(1.0 - (distance / radius) * 0.5);
+                        kb.setX(kb.getX() * (1 + kbh));
+                        kb.setZ(kb.getZ() * (1 + kbh));
                         target.setVelocity(kb);
 
                         if (target instanceof org.bukkit.entity.Player p) {
@@ -252,9 +256,10 @@ public class AbilityManager {
         @Override
         boolean execute(Player player, PlayerData data) {
             int stage = data.getEvolutionStage();
-            int duration = 10 + (stage - 1) * 5;
-            int strengthLevel = 1 + (stage - 1);
-            int speedLevel = 1 + (stage - 1);
+            var berserkerConfig = plugin.getConfigManager().getTwistConfig("berserker").getConfigurationSection("ability");
+            int duration = berserkerConfig != null ? berserkerConfig.getInt(("stage-" + stage + ".duration"), berserkerConfig.getInt("duration", 10)) : 10;
+            int strengthLevel = berserkerConfig != null ? berserkerConfig.getInt(("stage-" + stage + ".strength-amplifier"), berserkerConfig.getInt("strength-amplifier", 1)) : 1;
+            int speedLevel = berserkerConfig != null ? berserkerConfig.getInt(("stage-" + stage + ".speed-amplifier"), berserkerConfig.getInt("speed-amplifier", 1)) : 1;
 
             VFXManager engine = plugin.vfx();
             ScreenShake shake = engine.shake();
@@ -317,7 +322,8 @@ public class AbilityManager {
         @Override
         boolean execute(Player player, PlayerData data) {
             int stage = data.getEvolutionStage();
-            int duration = 8 + (stage - 1) * 4;
+            var phantomConfig = plugin.getConfigManager().getTwistConfig("phantom").getConfigurationSection("ability");
+            int duration = phantomConfig != null ? phantomConfig.getInt(("stage-" + stage + ".duration"), phantomConfig.getInt("duration", 8)) : 8;
 
             VFXManager engine = plugin.vfx();
             ScreenShake shake = engine.shake();
@@ -385,15 +391,16 @@ public class AbilityManager {
         @Override
         boolean execute(Player player, PlayerData data) {
             int stage = data.getEvolutionStage();
-            int radius = 5 + (stage - 1) * 2;
-            int igniteDuration = 4 + (stage - 1) * 2;
+            var infernalConfig = plugin.getConfigManager().getTwistConfig("infernal").getConfigurationSection("ability");
+            int radius = infernalConfig != null ? infernalConfig.getInt(("stage-" + stage + ".radius"), infernalConfig.getInt("radius", 5)) : 5;
+            int igniteDuration = infernalConfig != null ? infernalConfig.getInt(("stage-" + stage + ".ignite-duration"), infernalConfig.getInt("ignite-duration", 4)) : 4;
 
             VFXManager engine = plugin.vfx();
             ScreenShake shake = engine.shake();
             SoundDesigner sounds = plugin.vfx().sounds();
 
             player.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                org.bukkit.potion.PotionEffectType.FIRE_RESISTANCE, 200, 0, false, false));
+                org.bukkit.potion.PotionEffectType.FIRE_RESISTANCE, (stage >= 3 ? 20 : 10) * 20, 0, false, false));
 
             Location loc = player.getLocation();
             shake.shake(player, stage >= 3 ? ScreenShake.Intensity.HEAVY : ScreenShake.Intensity.MEDIUM);
@@ -451,6 +458,52 @@ public class AbilityManager {
         @Override String getName() { return "Freeze"; }
         @Override int getCooldown(int evolutionStage) {
             return 40 - (evolutionStage - 1) * 10;
+        }
+
+        @Override
+        boolean execute(Player player, PlayerData data) {
+            int stage = data.getEvolutionStage();
+            var frostConfig = plugin.getConfigManager().getTwistConfig("frostborn").getConfigurationSection("ability");
+            int radius = frostConfig != null ? frostConfig.getInt("radius", 5 + (stage - 1) * 2) : (5 + (stage - 1) * 2);
+            int slownessLevel = frostConfig != null ? frostConfig.getInt("slowness-amplifier", stage * 2) : (stage * 2);
+            if (slownessLevel > 10) slownessLevel = 10;
+            int durationSec = frostConfig != null ? frostConfig.getInt(("stage-" + stage + ".freeze-duration"), frostConfig.getInt("freeze-duration", 3)) : 3;
+            boolean freezeSelf = frostConfig != null ? frostConfig.getBoolean("stage-" + stage + ".freeze-self", frostConfig.getBoolean("freeze-self", stage >= 3)) : (stage >= 3);
+
+            VFXManager engine = plugin.vfx();
+            ScreenShake shake = engine.shake();
+            SoundDesigner sounds = plugin.vfx().sounds();
+            Location loc = player.getLocation();
+
+            shake.shake(player, ScreenShake.Intensity.LIGHT);
+            shake.shakeNearby(loc, radius + 4, ScreenShake.Intensity.LIGHT);
+            sounds.playAbilitySound(loc, SoundDesigner.SoundDesign.FREEZE, stage >= 2);
+            player.getWorld().playSound(loc, Sound.BLOCK_GLASS_HIT, 1.0f, 1.2f);
+
+            for (org.bukkit.entity.Entity e : loc.getWorld().getNearbyEntities(loc, radius, radius, radius)) {
+                if (e instanceof LivingEntity target && !target.isDead()) {
+                    if (target == player && !freezeSelf) continue;
+                    int amplifier = Math.max(0, slownessLevel - 1);
+                    target.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                        org.bukkit.potion.PotionEffectType.SLOWNESS, durationSec * 20, amplifier, false, false));
+                    target.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                        org.bukkit.potion.PotionEffectType.MINING_FATIGUE, durationSec * 20 / 2, 0, false, false));
+                    particleFreezeHit(target.getLocation().add(0, 0.8, 0), 20);
+                }
+            }
+
+            ParticlePatterns.explosion(loc, ParticlePatterns.Color.FROST, 1.6f);
+            ParticlePatterns.ringBurst(loc, radius, 56, ParticlePatterns.Color.FROST, 2.0f);
+            player.getWorld().spawnParticle(Particle.SNOWFLAKE, loc, 40, radius, 2, radius, 0.08);
+            particleIceFloor(loc, radius);
+
+            engine.holograms().spawnTextHologram(loc.clone().add(0, 2.2, 0), "§b§lFREEZE", 40, ParticlePatterns.Color.FROST.toAdventure());
+
+            if (stage >= 2) {
+                engine.holograms().spawnTextHologram(loc.clone().add(0, 3.0, 0), "§f§lFROST NEXUS", 55, ParticlePatterns.Color.FROST.toAdventure());
+            }
+
+            return true;
         }
 
         @Override

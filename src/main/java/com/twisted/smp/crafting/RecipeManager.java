@@ -27,6 +27,7 @@ public class RecipeManager {
         registerStabilityCrystal();
         registerEssenceExtractor();
         registerRiftKey();
+        registerVerityItems();
         plugin.getLogger().info("Registered " + registeredKeys.size() + " custom crafting recipes.");
     }
 
@@ -124,6 +125,83 @@ public class RecipeManager {
         meta.lore(List.of(
             net.kyori.adventure.text.Component.text("Use to start a Rift Event.")
                 .color(net.kyori.adventure.text.format.TextColor.color(0xaaaaaa))
+        ));
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    private void registerVerityItems() {
+        registerVerityCrown();
+        registerVerityTalisman();
+        registerVerityFocus();
+    }
+
+    private void registerVerityCrown() {
+        NamespacedKey key = new NamespacedKey(plugin, "verity_crown");
+        ShapedRecipe recipe = new ShapedRecipe(key, createVerityCrownItem());
+        recipe.shape("DND", "N N", " E ");
+        recipe.setIngredient('D', Material.DIAMOND_BLOCK);
+        recipe.setIngredient('N', Material.NETHERITE_BLOCK);
+        recipe.setIngredient('E', Material.ECHO_SHARD);
+        registerRecipe(key, recipe);
+    }
+
+    private void registerVerityTalisman() {
+        NamespacedKey key = new NamespacedKey(plugin, "verity_talisman");
+        ShapedRecipe recipe = new ShapedRecipe(key, createVerityTalismanItem());
+        recipe.shape(" E ", "NDN", " E ");
+        recipe.setIngredient('E', Material.ECHO_SHARD);
+        recipe.setIngredient('N', Material.NETHER_STAR);
+        recipe.setIngredient('D', Material.DIAMOND);
+        registerRecipe(key, recipe);
+    }
+
+    private void registerVerityFocus() {
+        NamespacedKey key = new NamespacedKey(plugin, "verity_focus");
+        ShapedRecipe recipe = new ShapedRecipe(key, createVerityFocusItem());
+        recipe.shape(" E ", "N N", " G ");
+        recipe.setIngredient('E', Material.ECHO_SHARD);
+        recipe.setIngredient('N', Material.NETHER_STAR);
+        recipe.setIngredient('G', Material.GOLD_BLOCK);
+        registerRecipe(key, recipe);
+    }
+
+    private ItemStack createVerityCrownItem() {
+        ItemStack item = new ItemStack(Material.NETHERITE_HELMET);
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(net.kyori.adventure.text.Component.text("Verity Crown")
+            .color(net.kyori.adventure.text.format.TextColor.color(0xfdcb6e)));
+        meta.lore(List.of(
+            net.kyori.adventure.text.Component.text("Transmute Essence to Energy. Right-click to use.")
+                .color(net.kyori.adventure.text.format.TextColor.color(0xbbbbbb)),
+            net.kyori.adventure.text.Component.text("Passive: Grants +20% energy efficiency.")
+                .color(net.kyori.adventure.text.format.TextColor.color(0xbbbbbb))
+        ));
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    private ItemStack createVerityTalismanItem() {
+        ItemStack item = new ItemStack(Material.AMETHYST_SHARD);
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(net.kyori.adventure.text.Component.text("Verity Talisman")
+            .color(net.kyori.adventure.text.format.TextColor.color(0x74b9ff)));
+        meta.lore(List.of(
+            net.kyori.adventure.text.Component.text("Converts up to 50 Essence to Energy (2x rate). Right-click to use.")
+                .color(net.kyori.adventure.text.format.TextColor.color(0xbbbbbb))
+        ));
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    private ItemStack createVerityFocusItem() {
+        ItemStack item = new ItemStack(Material.END_CRYSTAL);
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(net.kyori.adventure.text.Component.text("Verity Focus")
+            .color(net.kyori.adventure.text.format.TextColor.color(0xa29bfe)));
+        meta.lore(List.of(
+            net.kyori.adventure.text.Component.text("Right-click to freeze your Instability for 30 seconds.")
+                .color(net.kyori.adventure.text.format.TextColor.color(0xbbbbbb))
         ));
         item.setItemMeta(meta);
         return item;
