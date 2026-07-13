@@ -115,6 +115,14 @@ public class CombatListener implements Listener {
                 configManager.getMessage("evolution-available")));
         }
 
+        victimData.clearAbilityCooldowns();
+        if (victimData.getInstability() > 0) {
+            double reduced = victimData.getInstability() * 0.4;
+            victimData.subtractInstability(reduced);
+            victim.sendMessage(MiniMessage.miniMessage().deserialize(
+                "<dark_aqua>Instability reduced by " + (int) reduced + "% on death."));
+        }
+
         dataManager.savePlayerData(victimData, true);
     }
 
@@ -173,6 +181,15 @@ public class CombatListener implements Listener {
 
         if (data.getTwist() == Twist.TITAN) {
             event.getEntity().setVelocity(event.getEntity().getVelocity().multiply(0.7));
+        }
+
+        if (data.getTwist() == Twist.VOID && event.getEntity() instanceof org.bukkit.entity.EnderPearl) {
+            org.bukkit.configuration.ConfigurationSection voidConfig = configManager.getTwistConfig("voidwalker");
+            double rangeMult = voidConfig != null ? voidConfig.getDouble("passive.pearl-range-multiplier", 2.0) : 2.0;
+            double cdReduction = voidConfig != null ? voidConfig.getDouble("passive.pearl-cooldown-reduction", 0.5) : 0.5;
+            event.getEntity().setVelocity(event.getEntity().getVelocity().multiply(rangeMult));
+            int baseCooldown = ((org.bukkit.entity.EnderPearl) event.getEntity()).getCooldown();
+            ((org.bukkit.entity.EnderPearl) event.getEntity()).setCooldown((int) (baseCooldown * (1.0 - cdReduction)));
         }
     }
 }

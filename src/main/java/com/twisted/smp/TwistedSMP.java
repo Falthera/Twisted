@@ -110,7 +110,7 @@ public final class TwistedSMP extends JavaPlugin {
                 }
             }
             antiAbuseManager.tick();
-        }, 20 * 60L, 20 * 60L);
+        }, 20L, instabilityManager.getEffectTickInterval());
 
         getServer().getScheduler().runTaskTimer(this, () -> {
             for (Player online : getServer().getOnlinePlayers()) {

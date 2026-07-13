@@ -29,6 +29,10 @@ public class InstabilityManager {
         return configManager.getConfig().getDouble("instability.passive-instability-gain", 0);
     }
 
+    public int getEffectTickInterval() {
+        return configManager.getConfig().getInt("instability.effect-tick-interval", 60);
+    }
+
     public double getAbilityOverflowInstability() {
         return configManager.getConfig().getDouble("instability.ability-overflow-instability", 5);
     }
@@ -93,26 +97,36 @@ public class InstabilityManager {
         if (player == null || !player.isOnline()) return;
 
         int level = getInstabilityLevel(data);
-        if (level >= 1 && random.nextDouble() < 0.1) {
+        if (level >= 1 && random.nextDouble() < 0.08 + level * 0.07) {
             player.damage(1.0);
         }
         if (level >= 2) {
             player.addPotionEffect(new org.bukkit.potion.PotionEffect(
                 org.bukkit.potion.PotionEffectType.STRENGTH, 40, 0, false, false));
-            if (random.nextDouble() < 0.3) {
+            if (random.nextDouble() < 0.2 + level * 0.15) {
                 player.addPotionEffect(new org.bukkit.potion.PotionEffect(
                     org.bukkit.potion.PotionEffectType.WITHER, 20, 0, false, false));
             }
+            if (random.nextDouble() < 0.1 + level * 0.1) {
+                player.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                    org.bukkit.potion.PotionEffectType.NAUSEA, 60, 0, false, false));
+            }
         }
         if (level >= 3) {
-            if (random.nextDouble() < 0.15) {
+            if (random.nextDouble() < 0.25 + level * 0.1) {
                 org.bukkit.Location loc = player.getLocation().clone().add(
                     (random.nextDouble() - 0.5) * 10,
                     0,
                     (random.nextDouble() - 0.5) * 10);
                 if (player.getWorld().getBlockAt(loc).getType().isAir()) {
                     player.teleport(loc);
+                    player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(
+                        "<dark_red>The void reaches out..."));
                 }
+            }
+            if (random.nextDouble() < 0.15) {
+                player.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                    org.bukkit.potion.PotionEffectType.BLINDNESS, 40, 0, false, false));
             }
         }
     }

@@ -12,6 +12,7 @@ import com.twisted.smp.twists.Twist;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -119,8 +120,26 @@ public class AbilityManager {
             double range = 15 + (stage - 1) * 10;
             Location loc = player.getLocation();
             Vector direction = loc.getDirection().normalize();
+            World world = player.getWorld();
             Location target = loc.clone().add(direction.multiply(range));
-            if (target.getY() < -64) target.setY(loc.getY());
+
+            int safeFloor = world.getMinHeight() + 1;
+            if (target.getY() < safeFloor) target.setY(loc.getY());
+
+            boolean safe = isSafeTeleport(world, target);
+            if (!safe) {
+                target.setY(loc.getY());
+                safe = isSafeTeleport(world, target);
+                if (!safe) {
+                    target.setY(safeFloor);
+                    safe = isSafeTeleport(world, target);
+                    if (!safe) {
+                        player.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(
+                            "<red>Void Step blocked — no safe destination found."));
+                        return false;
+                    }
+                }
+            }
 
             VFXManager engine = plugin.vfx();
             ScreenShake shake = engine.shake();
@@ -147,6 +166,12 @@ public class AbilityManager {
             }
 
             return true;
+        }
+
+        private boolean isSafeTeleport(World world, Location loc) {
+            org.bukkit.block.Block feet = world.getBlockAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+            org.bukkit.block.Block head = world.getBlockAt(loc.getBlockX(), loc.getBlockY() + 1, loc.getBlockZ());
+            return !feet.getType().isSolid() && !head.getType().isSolid();
         }
     }
 

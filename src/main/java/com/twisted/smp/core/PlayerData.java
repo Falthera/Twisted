@@ -131,6 +131,10 @@ public class PlayerData implements Cloneable {
         abilityCooldowns.remove(ability);
     }
 
+    public void clearAbilityCooldowns() {
+        abilityCooldowns.clear();
+    }
+
     public long getCooldownRemaining(String ability) {
         Long endTime = abilityCooldowns.get(ability);
         if (endTime == null) return 0;
