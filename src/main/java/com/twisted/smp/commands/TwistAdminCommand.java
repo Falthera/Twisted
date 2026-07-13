@@ -173,7 +173,6 @@ public class TwistAdminCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize("<red>Reload failed: " + e.getMessage()));
         }
     }
-    }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
