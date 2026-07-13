@@ -198,8 +198,8 @@ public class DataManager {
         return cache.computeIfAbsent(uuid, this::loadPlayerData);
     }
 
-    public Set<UUID> getPlayerDataCache() {
-        return Collections.unmodifiableSet(cache.keySet());
+    public Map<UUID, PlayerData> getPlayerDataCache() {
+        return Collections.unmodifiableMap(cache);
     }
 
     public void shutdown() {

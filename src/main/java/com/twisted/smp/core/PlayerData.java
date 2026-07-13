@@ -107,6 +107,10 @@ public class PlayerData implements Cloneable {
         this.instability = clampInstability(this.instability + amount);
     }
 
+    public void subtractInstability(double amount) {
+        this.instability = Math.max(0, this.instability - Math.abs(amount));
+    }
+
     public void setEvolutionStage(int stage) {
         this.evolutionStage = Math.max(1, Math.min(3, stage));
     }

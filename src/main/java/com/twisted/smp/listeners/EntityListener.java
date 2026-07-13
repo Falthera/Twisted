@@ -11,9 +11,9 @@ import org.bukkit.Sound;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
-import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class EntityListener implements Listener {
 
@@ -32,9 +32,9 @@ public class EntityListener implements Listener {
     }
 
     @EventHandler
-    public void onEnderTeleport(EntityTeleportEvent event) {
-        if (!(event.getEntity() instanceof Player player)) return;
-        if (event.getCause() != EntityTeleportEvent.TeleportCause.ENDER_PEARL) return;
+    public void onEnderTeleport(PlayerTeleportEvent event) {
+        Player player = event.getPlayer();
+        if (event.getCause() != PlayerTeleportEvent.TeleportCause.ENDER_PEARL) return;
         PlayerData data = dataManager.loadPlayerData(player.getUniqueId());
         if (data == null || !data.isTwistSelected()) return;
 

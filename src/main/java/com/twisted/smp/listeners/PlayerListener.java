@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -266,11 +267,11 @@ public class PlayerListener implements Listener {
         if (maxHealth != null) {
             maxHealth.setBaseValue(20.0);
         }
-        org.bukkit.attribute.AttributeInstance speed = player.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MOVEMENT_SPEED);
+        org.bukkit.attribute.AttributeInstance speed = player.getAttribute(org.bukkit.attribute.Attribute.MOVEMENT_SPEED);
         if (speed != null) {
             speed.setBaseValue(0.1);
         }
-        org.bukkit.attribute.AttributeInstance kb = player.getAttribute(org.bukkit.attribute.Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+        org.bukkit.attribute.AttributeInstance kb = player.getAttribute(org.bukkit.attribute.Attribute.KNOCKBACK_RESISTANCE);
         if (kb != null) {
             kb.setBaseValue(0.0);
         }
@@ -299,13 +300,13 @@ public class PlayerListener implements Listener {
                     maxHealth.setBaseValue(20 + extraHearts + ((data.getEvolutionStage() - 1) * extraHearts));
                 }
                 double kbResist = config != null ? config.getDouble("passive.knockback-resistance", 0.0) : 0.0;
-                org.bukkit.attribute.AttributeInstance kb = player.getAttribute(org.bukkit.attribute.Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+                org.bukkit.attribute.AttributeInstance kb = player.getAttribute(org.bukkit.attribute.Attribute.KNOCKBACK_RESISTANCE);
                 if (kb != null) {
                     kb.setBaseValue(kbResist);
                 }
                 double speedMult = config != null ? config.getDouble("passive.movement-speed-multiplier", 1.0) : 1.0;
                 if (speedMult != 1.0) {
-                    org.bukkit.attribute.AttributeInstance speed = player.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MOVEMENT_SPEED);
+                    org.bukkit.attribute.AttributeInstance speed = player.getAttribute(org.bukkit.attribute.Attribute.MOVEMENT_SPEED);
                     if (speed != null) {
                         speed.setBaseValue(0.1 * speedMult);
                     }

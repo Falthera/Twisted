@@ -10,6 +10,7 @@ import com.twisted.smp.vfx.SoundDesigner;
 import com.twisted.smp.vfx.VFXManager;
 import com.twisted.smp.twists.Twist;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -183,7 +184,7 @@ public class AbilityManager {
 
                         if (target instanceof org.bukkit.entity.Player p) {
                             long shieldDisableTicks = Math.min(100, 40 + (stage - 1) * 20);
-                            p.disableShield(shieldDisableTicks);
+                            p.setCooldown(Material.SHIELD, (int) shieldDisableTicks);
                         }
 
                         ParticlePatterns.damageNumber(target.getLocation().clone().add(0, 1, 0), damage, ParticlePatterns.Color.EARTH, plugin);
