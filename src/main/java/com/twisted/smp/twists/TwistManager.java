@@ -119,8 +119,13 @@ public class TwistManager {
 
     public String format(String input) {
         if (input == null || input.isEmpty()) return "";
-        net.kyori.adventure.text.Component parsed = net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(input);
-        return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().serialize(parsed);
+        try {
+            net.kyori.adventure.text.Component parsed = net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(input);
+            return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().serialize(parsed);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed to parse MiniMessage in twist display name: " + input + " (" + e.getMessage() + ")");
+            return input.replaceAll("<[^>]+>", "");
+        }
     }
 
     public void openTwistSelectionGUI(org.bukkit.entity.Player player) {

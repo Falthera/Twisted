@@ -30,41 +30,40 @@ public class DataManager {
 
         try {
             Connection conn = databaseManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM player_data WHERE uuid = ?");
-            ps.setString(1, uuid.toString());
-            ResultSet rs = ps.executeQuery();
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM player_data WHERE uuid = ?")) {
+                ps.setString(1, uuid.toString());
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String twistName = rs.getString("twist");
+                        Twist twist = Twist.valueOf(twistName.toUpperCase());
+                        double energy = rs.getDouble("energy");
+                        double essence = rs.getDouble("essence");
+                        double instability = rs.getDouble("instability");
+                        int evoStage = rs.getInt("evolution_stage");
+                        int kills = rs.getInt("kills");
+                        int deaths = rs.getInt("deaths");
+                        boolean twistSelected = rs.getInt("twist_selected") == 1;
+                        long firstJoin = rs.getLong("first_join");
 
-            if (rs.next()) {
-                String twistName = rs.getString("twist");
-                Twist twist = Twist.valueOf(twistName.toUpperCase());
-                double energy = rs.getDouble("energy");
-                double essence = rs.getDouble("essence");
-                double instability = rs.getDouble("instability");
-                int evoStage = rs.getInt("evolution_stage");
-                int kills = rs.getInt("kills");
-                int deaths = rs.getInt("deaths");
-                boolean twistSelected = rs.getInt("twist_selected") == 1;
-                long firstJoin = rs.getLong("first_join");
-
-                Map<String, Long> cooldowns = new HashMap<>();
-                String cooldownsBlob = rs.getString("ability_cooldowns");
-                if (cooldownsBlob != null && !cooldownsBlob.isEmpty()) {
-                    for (String part : cooldownsBlob.split(";")) {
-                        String[] kv = part.split("=");
-                        if (kv.length == 2) {
-                            try {
-                                cooldowns.put(kv[0], Long.parseLong(kv[1]));
-                            } catch (NumberFormatException ignored) {}
+                        Map<String, Long> cooldowns = new HashMap<>();
+                        String cooldownsBlob = rs.getString("ability_cooldowns");
+                        if (cooldownsBlob != null && !cooldownsBlob.isEmpty()) {
+                            for (String part : cooldownsBlob.split(";")) {
+                                String[] kv = part.split("=");
+                                if (kv.length == 2) {
+                                    try {
+                                        cooldowns.put(kv[0], Long.parseLong(kv[1]));
+                                    } catch (NumberFormatException ignored) {}
+                                }
+                            }
                         }
+                        data = new PlayerData(uuid, twist, energy, essence, instability, evoStage, kills, deaths, cooldowns, twistSelected, firstJoin);
+                    } else {
+                        data = createNewPlayerData(uuid);
+                        savePlayerData(data, false);
                     }
                 }
-                data = new PlayerData(uuid, twist, energy, essence, instability, evoStage, kills, deaths, cooldowns, twistSelected, firstJoin);
-            } else {
-                data = createNewPlayerData(uuid);
-                savePlayerData(data, false);
             }
-            rs.close();
-            ps.close();
             cache.put(uuid, data);
             return data;
         } catch (Exception e) {
