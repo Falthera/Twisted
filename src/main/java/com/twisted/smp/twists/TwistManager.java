@@ -118,8 +118,9 @@ public class TwistManager {
     }
 
     public String format(String input) {
-        if (input == null) return "";
-        return org.bukkit.ChatColor.translateAlternateColorCodes('&', input);
+        if (input == null || input.isEmpty()) return "";
+        net.kyori.adventure.text.Component parsed = net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(input);
+        return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().serialize(parsed);
     }
 
     public void openTwistSelectionGUI(org.bukkit.entity.Player player) {
