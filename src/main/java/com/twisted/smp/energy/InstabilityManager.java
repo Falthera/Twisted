@@ -92,6 +92,7 @@ public class InstabilityManager {
     public TwistedSMP getPlugin() {
         return plugin;
     }
+
     public void applyInstabilityEffects(PlayerData data) {
         org.bukkit.entity.Player player = org.bukkit.Bukkit.getPlayer(data.getUuid());
         if (player == null || !player.isOnline()) return;
